@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boveda-v1';
+const CACHE_NAME = 'boveda-v2';
 const ASSETS = [
   './index.html'
 ];
