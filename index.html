@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bóveda Digital - iAparaMayores</title>
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        /* ==========================================
+           1. ESTILOS BASE (DISEÑO CLARO TRADICIONAL)
+           ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #F5F5F5;
+            color: #1A1A1A;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pantalla-completa {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            padding-bottom: 250px;
+            overflow-y: auto;
+            height: calc(100vh - 120px);
+        }
+
+        .oculto {
+            display: none !important;
+        }
+
+        /* ==========================================
+           2. CABECERA
+           ========================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FFFFFF;
+            padding: 10px 15px;
+            border-bottom: 3px solid #E0E0E0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .logo-boveda {
+            font-size: 20px;
+            font-weight: bold;
+            color: #004D40;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .btn-cabecera-salir {
+            background-color: #D32F2F;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-cabecera-ajustes {
+            background-color: #FFB300;
+            color: black;
+            border: none;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        h2 {
+            font-size: 24px;
+            text-align: center;
+            margin: 10px 0;
+            color: #004D40;
+        }
+
+        /* ==========================================
+           3. CARRUSEL Y TARJETAS
+           ========================================== */
+        .contenedor-carrusel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 100vw;
+            overflow: hidden;
+        }
+
+        .btn-flecha {
+            background-color: #00796B;
+            color: white;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            width: 40px;
+            height: 55px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tarjeta-carrusel {
+            flex: 1;
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 15px;
+            border: 3px solid #00796B;
+            border-top: 8px solid #00796B;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            max-width: calc(100% - 90px);
+            display: none;
+            position: relative;
+        }
+
+        .tarjeta-carrusel.activa {
+            display: block;
+        }
+
+        .header-tarjeta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            padding-right: 65px;
+        }
+
+        .btn-editar-tarjeta-texto {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .campo-tarjeta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .etiqueta {
+            font-size: 13px;
+            font-weight: bold;
+            color: #555555;
+            width: 45px;
+            flex-shrink: 0;
+        }
+
+        input {
+            flex-grow: 1;
+            min-width: 0;
+            background-color: #F9F9F9;
+            border: 2px solid #CCCCCC;
+            color: #1A1A1A;
+            padding: 10px;
+            font-size: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .btn-copiar, .btn-ojo {
+            background-color: #E0F2F1;
+            color: #004D40;
+            border: 2px solid #00796B;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-anadir {
+            background-color: #FFB300;
+            color: #000000;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 260px;
+            margin: 10px auto;
+            display: block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .texto-gigante {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00796B;
+            text-align: center;
+            margin-top: 5px;
+            background: #E0F2F1;
+            padding: 5px;
+            border-radius: 6px;
+        }
+
+        .foto-placeholder {
+            background-color: #E0E0E0;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #666;
+            font-weight: bold;
+            border: 2px dashed #999;
+            overflow: hidden;
+        }
+
+        /* ==========================================
+           4. MODALES
+           ========================================== */
+        .pantalla-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .contenido-modal {
+            background-color: #FFFFFF;
+            width: 100%;
+            max-width: 340px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .grupo-formulario {
+            margin-bottom: 15px;
+        }
+
+        .grupo-formulario label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .bloque-botones-modal {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-modal.guardar { background-color: #00796B; color: white; }
+        .btn-modal.cancelar { background-color: #E0E0E0; color: #333; }
+
+        .opcion-ajuste {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* ==========================================
+           5. ZONA INFERIOR
+           ========================================== */
+        .zona-fija-inferior {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #FFFFFF;
+            border-top: 3px solid #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .bloque-acciones-rapidas {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 15px 4px 15px;
+        }
+
+        .btn-accion-redondo {
+            flex: 1;
+            background-color: #CFD8DC;
+            color: #263238;
+            border: 2px solid #90A4AE;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .pestanas-inferiores {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 4px 15px 8px 15px;
+        }
+
+        .btn-tab {
+            flex: 1;
+            background-color: #E0E0E0;
+            color: #555555;
+            border: none;
+            padding: 12px 5px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn-tab.activo {
+            background-color: #00796B;
+            color: white;
+        }
+
+        .bloque-soporte {
+            background-color: #F1F8F6;
+            text-align: center;
+            padding: 8px 10px;
+            font-size: 13px;
+            color: #004D40;
+            border-top: 1px solid #E0E0E0;
+            font-weight: bold;
+        }
+
+        .bloque-soporte a {
+            color: #0288D1;
+            text-decoration: underline;
+        }
+
+        .banner-publicidad-fantasma {
+            height: 70px;
+            background-color: #F5F5F5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CABECERA -->
+    <header>
+        <button class="btn-cabecera-salir" onclick="bloquearApp()">Salir</button>
+        <div class="logo-boveda">Bóveda Digital</div>
+        <button class="btn-cabecera-ajustes" id="btn-abrir-ajustes">Ajustes</button>
+    </header>
+
+    <main id="app-principal" class="pantalla-completa">
+        
+        <!-- SECCIÓN 1: CLAVES -->
+        <section id="vista-claves" class="vista-contenido">
+            <h2>Mis Claves</h2>
+            
+            <div class="contenedor-carrusel">
+                <button class="btn-flecha" onclick="cambiarTarjetaClaves(-1)"></button>
+                <div id="dinamico-claves" style="display: contents;"></div>
+                <button class="btn-flecha" onclick="cambiarTarjetaClaves(1)"></button>
+            </div>
+
+            <button class="btn-anadir" onclick="abrirParaNueva('claves')"> Añadir Nueva</button>
+        </section>
+
+        <!-- SECCIÓN 2: PAPELES -->
+        <section id="vista-papeles" class="vista-contenido oculto">
+            <h2>Mis Papeles</h2>
+            
+            <div class="contenedor-carrusel">
+                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(-1)"></button>
+                <div id="dinamico-papeles" style="display: contents;"></div>
+                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(1)"></button>
+            </div>
+
+            <button class="btn-anadir" onclick="abrirParaNueva('papeles')"> Añadir Papel</button>
+        </section>
+
+        <!-- SECCIÓN 3: ESCÁNER DE PAPELES -->
+        <section id="vista-escaner" class="vista-contenido oculto">
+            <h2>Escáner de Papeles</h2>
+            
+            <video id="video-camara" width="100%" height="240" autoplay style="background:#000; border-radius:10px;"></video>
+            
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-modal guardar" onclick="tomarFoto()" style="flex:1;"> Capturar</button>
+            </div>
+
+            <canvas id="canvas-foto" style="display:none;"></canvas>
+            <div id="resultado-foto" style="margin-top:15px; text-align:center;"></div>
+            
+            <!-- BOTONES TRAS LA CAPTURA -->
+            <div id="controles-foto" class="oculto" style="margin-top: 10px;">
+                <button class="btn-anadir" onclick="guardarFotoEnPapeles()" style="background:#388E3C; color:white;"> Guardar en Mis Papeles</button>
+                <button class="btn-anadir" onclick="enviarPorEmail()" style="background:#0288D1; color:white; margin-top: 5px;"> Enviar por Mail</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: FORMULARIO -->
+    <div id="modal-formulario" class="pantalla-modal oculto">
+        <div class="contenido-modal" style="border-top: 8px solid #FFB300;">
+            <h3 id="titulo-modal" style="margin-bottom: 15px; color: #004D40;">Añadir Credencial</h3>
+            
+            <input type="hidden" id="form-contexto">
+            <input type="hidden" id="form-indice-edicion">
+
+            <div class="grupo-formulario">
+                <label id="lbl-nombre">Nombre del Servicio o Papel:</label>
+                <input type="text" id="inp-nombre" placeholder="Ej: Mi Argentina, PAMI, Gas">
+            </div>
+            <div class="grupo-formulario">
+                <label id="lbl-dato1">Usuario, CUIL o Nro:</label>
+                <input type="text" id="inp-dato1" placeholder="Ingrese el identificador">
+            </div>
+            <div class="grupo-formulario">
+                <label id="lbl-dato2">Contraseña o Detalle:</label>
+                <input type="text" id="inp-dato2" placeholder="Ingrese la clave o nota">
+            </div>
+            <div class="bloque-botones-modal">
+                <button class="btn-modal cancelar" id="btn-cerrar-formulario">Cerrar</button>
+                <button class="btn-modal guardar" id="btn-guardar-formulario">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: AJUSTES -->
+    <div id="modal-ajustes" class="pantalla-modal oculto">
+        <div class="contenido-modal" style="border-top: 8px solid #00796B;">
+            <h3 style="margin-bottom: 15px; color: #004D40;">Seguridad de la App</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Configure sus métodos de acceso:</p>
+            
+            <div class="opcion-ajuste"><input type="checkbox" checked> Huella Digital</div>
+            <div class="opcion-ajuste"><input type="checkbox" checked> Código PIN</div>
+
+            <div class="bloque-botones-modal">
+                <button class="btn-modal cancelar" id="btn-cerrar-ajustes">Volver</button>
+                <button class="btn-modal guardar" id="btn-guardar-ajustes">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ZONA INFERIOR -->
+    <div class="zona-fija-inferior">
+        <div class="bloque-acciones-rapidas">
+            <button class="btn-accion-redondo">Compartir</button>
+            <button class="btn-accion-redondo" onclick="window.print()">Imprimir</button>
+        </div>
+        
+        <nav class="pestanas-inferiores">
+            <button id="tab-claves" class="btn-tab activo">Claves</button>
+            <button id="tab-papeles" class="btn-tab">Papeles</button>
+            <button id="tab-escaner" class="btn-tab">Escanear</button>
+        </nav>
+
+        <div class="bloque-soporte">
+            Sugerencias o dudas comunícate con nosotros a <a href="mailto:iaparamayoresapp@gmail.com">iaparamayoresapp@gmail.com</a>
+        </div>
+        <div class="banner-publicidad-fantasma"></div>
+    </div>
+
+    <!-- PANTALLA DE BLOQUEO CON CONTROL ESTRICTO DE 2 INTENTOS -->
+    <div id="pantalla-bloqueo" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#004D40; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif;">
+        <h2> Bóveda Digital</h2>
+        <p style="margin-top:10px;">Ingrese su PIN para continuar</p>
+        <input type="password" id="inp-pin" style="width:200px; text-align:center; font-size:24px; letter-spacing:10px; margin:20px; color:black; background:white;" maxlength="4">
+        <button id="btn-entrar-pin" onclick="validarPin()" style="padding:15px 30px; font-size:18px; border-radius:10px; border:none; background:#FFB300; font-weight:bold; cursor:pointer; color:black; width:200px;">Entrar</button>
+
+        <div style="margin-top:40px; border-top:1px solid rgba(255,255,255,0.3); padding-top:20px; text-align:center;">
+            <p style="font-size:14px; margin-bottom:5px;">¿Querés cambiar tu PIN?</p>
+            <input type="password" id="nuevo-pin" maxlength="4" placeholder="Nuevo PIN" style="width:120px; text-align:center; font-size:16px; padding:5px; margin-bottom:10px; color:black; background:white;">
+            <br>
+            <button onclick="guardarNuevoPin()" style="background:transparent; color:#FFB300; border:1px solid #FFB300; padding:5px 15px; border-radius:5px; font-size:12px; cursor:pointer; font-weight:bold;">Guardar Nuevo PIN</button>
+        </div>
+    </div>
+
+    <script>
+        // BASE DE DATOS LOCAL
+        let datosApp = JSON.parse(localStorage.getItem('datos_boveda_v1')) || {
+            claves: [
+                { nombre: "Mi ANSES", icono: "", tag1: "CUIL:", dato1: "20-12345678-9", tag2: "Clave:", dato2: "ClaveAnses2026" },
+                { nombre: "Mi PAMI", icono: "", tag1: "User:", dato1: "afiliado_pami", tag2: "Clave:", dato2: "PamiClave987" },
+                { nombre: "Home Banking", icono: "", tag1: "DNI:", dato1: "12.345.678", tag2: "Clave:", dato2: "BancoClave2026" }
+            ],
+            papeles: [
+                { nombre: "Carnet PAMI", icono: "", tag1: "Nro Afiliado:", dato1: "1234567890", tag2: "Tipo:", dato2: "Salud", foto: "" }
+            ]
+        };
+
+        let indiceClaves = 0;
+        let indicePapeles = 0;
+        let intentosPin = 0;
+        let fotoCapturadaTemp = "";
+
+        const modalFormulario = document.getElementById('modal-formulario');
+        const modalAjustes = document.getElementById('modal-ajustes');
+
+        // SEGURIDAD PIN: BLOQUEO AL SEGUNDO INTENTO
+        function validarPin() {
+            const pinIngresado = document.getElementById('inp-pin').value;
+            const pinGuardado = localStorage.getItem('mi_pin_boveda') || "1234";
+
+            if (pinIngresado === pinGuardado) {
+                intentosPin = 0;
+                document.getElementById('pantalla-bloqueo').style.display = 'none';
+                document.getElementById('inp-pin').value = '';
+            } else {
+                intentosPin++;
+                if (intentosPin >= 2) {
+                    alert('¡ACCESO BLOQUEADO! Superó los 2 intentos fallidos por seguridad.');
+                    document.getElementById('inp-pin').disabled = true;
+                    document.getElementById('btn-entrar-pin').disabled = true;
+                    document.getElementById('btn-entrar-pin').style.backgroundColor = "#CCCCCC";
+                } else {
+                    alert('PIN incorrecto. Te queda 1 solo intento.');
+                    document.getElementById('inp-pin').value = '';
+                }
+            }
+        }
+
+        function bloquearApp() { 
+            document.getElementById('pantalla-bloqueo').style.display = 'flex'; 
+        }
+
+        function guardarNuevoPin() {
+            const nuevoPin = document.getElementById('nuevo-pin').value;
+            if (nuevoPin.length === 4 && !isNaN(nuevoPin)) {
+                localStorage.setItem('mi_pin_boveda', nuevoPin);
+                alert('¡PIN cambiado con éxito! Su nuevo PIN es: ' + nuevoPin);
+                document.getElementById('nuevo-pin').value = '';
+            } else { alert('El PIN debe ser de 4 números.'); }
+        }
+
+        // DIBUJAR TARJETAS
+        function dibujarTarjetas() {
+            // Claves
+            const divClaves = document.getElementById('dinamico-claves');
+            if(divClaves) {
+                divClaves.innerHTML = '';
+                if(datosApp.claves.length === 0) {
+                    divClaves.innerHTML = `<div class="tarjeta-carrusel activa" style="text-align:center; padding:30px; font-weight:bold; color:#777;">No hay claves cargadas.</div>`;
+                } else {
+                    if (indiceClaves >= datosApp.claves.length) indiceClaves = 0;
+                    if (indiceClaves < 0) indiceClaves = datosApp.claves.length - 1;
+                    
+                    datosApp.claves.forEach((c, idx) => {
+                        const esActiva = (idx === indiceClaves) ? 'activa' : '';
+                        divClaves.innerHTML += `
+                            <div class="tarjeta-carrusel ${esActiva}">
+                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('claves', ${idx})">Editar</button>
+                                <div class="header-tarjeta"><span>${c.icono || ''}</span> ${c.nombre}</div>
+                                <div class="campo-tarjeta">
+                                    <span class="etiqueta">${c.tag1 || 'User:'}</span>
+                                    <input type="text" value="${c.dato1}" readonly>
+                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato1}')">Copiar</button>
+                                </div>
+                                <div class="campo-tarjeta">
+                                    <span class="etiqueta">${c.tag2 || 'Clave:'}</span>
+                                    <input type="password" value="${c.dato2}" id="pass-dinamica-c-${idx}" readonly>
+                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')"></button>
+                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato2}')">Copiar</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // Papeles
+            const divPapeles = document.getElementById('dinamico-papeles');
+            if(divPapeles) {
+                divPapeles.innerHTML = '';
+                if(datosApp.papeles.length === 0) {
+                    divPapeles.innerHTML = `<div class="tarjeta-carrusel activa" style="text-align:center; padding:30px; font-weight:bold; color:#777;">No hay papeles cargadas.</div>`;
+                } else {
+                    if (indicePapeles >= datosApp.papeles.length) indicePapeles = 0;
+                    if (indicePapeles < 0) indicePapeles = datosApp.papeles.length - 1;
+
+                    datosApp.papeles.forEach((p, idx) => {
+                        const esActiva = (idx === indicePapeles) ? 'activa' : '';
+                        const vistaFoto = p.foto 
+                            ? `<img src="${p.foto}" style="max-width:100%; max-height:160px; border-radius:6px;">` 
+                            : ` [ Foto de Carnet Activa ]`;
+
+                        divPapeles.innerHTML += `
+                            <div class="tarjeta-carrusel ${esActiva}" style="border-top-color: #00E676; border-color: #00E676; max-width: 100%; width: 100%; flex-shrink:0;">
+                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('papeles', ${idx})">Editar</button>
+                                <div class="header-tarjeta"><span>${p.icono || ''}</span> ${p.nombre}</div>
+                                <div class="foto-placeholder">${vistaFoto}</div>
+                                <div style="margin-top: 10px;">
+                                    <span class="etiqueta" style="width:100%;">${p.tag1 || 'Nro Doc:'}</span>
+                                    <p class="texto-gigante">${p.dato1}</p>
+                                </div>
+                                <div style="margin-top: 5px; font-size:12px; color:#555; text-align:center; font-weight:bold;">
+                                    ${p.tag2 || 'Detalle:'} ${p.dato2}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+        }
+
+        function cambiarTarjetaClaves(direccion) {
+            if(datosApp.claves.length <= 1) return;
+            indiceClaves += direccion;
+            dibujarTarjetas();
+        }
+
+        function cambiarTarjetaPapeles(direccion) {
+            if(datosApp.papeles.length <= 1) return;
+            indicePapeles += direccion;
+            dibujarTarjetas();
+        }
+
+        // CÁMARA Y ESCÁNER
+        const video = document.getElementById('video-camara');
+        
+        function iniciarCamara() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                    .then(stream => { video.srcObject = stream; })
+                    .catch(err => { console.error("Error al acceder a la cámara: ", err); });
+            }
+        }
+
+        function tomarFoto() {
+            const canvas = document.getElementById('canvas-foto');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 240;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            fotoCapturadaTemp = canvas.toDataURL('image/png');
+            document.getElementById('resultado-foto').innerHTML = `<img src="${fotoCapturadaTemp}" style="width:100%; border-radius:10px; border:2px solid #00796B;">`;
+            document.getElementById('controles-foto').classList.remove('oculto');
+        }
+
+        function guardarFotoEnPapeles() {
+            if(!fotoCapturadaTemp) return;
+            
+            datosApp.papeles.push({ 
+                nombre: "Documento Escaneado", 
+                icono: "", 
+                tag1: "Fecha:", 
+                dato1: new Date().toLocaleDateString(), 
+                tag2: "Tipo:", 
+                dato2: "Capturado desde Escáner",
+                foto: fotoCapturadaTemp
+            });
+            
+            localStorage.setItem('datos_boveda_v1', JSON.stringify(datosApp));
+            alert("¡Documento guardado con éxito en 'Mis Papeles'!");
+            
+            // Ir a papeles automáticamente
+            document.getElementById('tab-papeles').click();
+            indicePapeles = datosApp.papeles.length - 1;
+            dibujarTarjetas();
+        }
+
+        function enviarPorEmail() {
+            const asunto = "Documento Escaneado - Bóveda Digital";
+            const cuerpo = "Adjunto el documento recién escaneado desde mi aplicación.";
+            window.location.href = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+            alert("Se abrirá tu correo. ¡Recuerda adjuntar la foto capturada!");
+        }
+
+        // FORMULARIOS
+        function abrirParaNueva(contexto) {
+            document.getElementById('form-contexto').value = contexto;
+            document.getElementById('form-indice-edicion').value = "";
+            
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Añadir Credencial" : "Añadir Papel";
+            document.getElementById('lbl-nombre').innerText = "Nombre del Servicio o Papel:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número de Documento:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Tipo / Notas Adicionales:";
+
+            document.getElementById('inp-nombre').value = "";
+            document.getElementById('inp-dato1').value = "";
+            document.getElementById('inp-dato2').value = "";
+
+            modalFormulario.classList.remove('oculto');
+        }
+
+        function abrirParaEditar(contexto, idx) {
+            document.getElementById('form-contexto').value = contexto;
+            document.getElementById('form-indice-edicion').value = idx;
+
+            const item = datosApp[contexto][idx];
+            
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Editar Credencial" : "Editar Papel";
+            document.getElementById('lbl-nombre').innerText = "Nombre del Servicio o Papel:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número de Documento:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Tipo / Notas Adicionales:";
+
+            document.getElementById('inp-nombre').value = item.nombre;
+            document.getElementById('inp-dato1').value = item.dato1;
+            document.getElementById('inp-dato2').value = item.dato2;
+
+            modalFormulario.classList.remove('oculto');
+        }
+
+        document.getElementById('btn-guardar-formulario').addEventListener('click', () => {
+            const contexto = document.getElementById('form-contexto').value;
+            const indiceEdicion = document.getElementById('form-indice-edicion').value;
+
+            const nom = document.getElementById('inp-nombre').value.trim();
+            const d1 = document.getElementById('inp-dato1').value.trim();
+            const d2 = document.getElementById('inp-dato2').value.trim();
+
+            if(!nom || !d1) {
+                alert('Por favor complete los campos principales.');
+                return;
+            }
+
+            if(indiceEdicion === "") {
+                if(contexto === 'claves') {
+                    datosApp.claves.push({ nombre: nom, icono: "", tag1: "User:", dato1: d1, tag2: "Clave:", dato2: d2 });
+                    indiceClaves = datosApp.claves.length - 1;
+                } else {
+                    datosApp.papeles.push({ nombre: nom, icono: "", tag1: "Nro Afiliado:", dato1: d1, tag2: "Nota:", dato2: d2, foto: "" });
+                    indicePapeles = datosApp.papeles.length - 1;
+                }
+            } else {
+                const idx = parseInt(indiceEdicion);
+                datosApp[contexto][idx].nombre = nom;
+                datosApp[contexto][idx].dato1 = d1;
+                datosApp[contexto][idx].dato2 = d2;
+            }
+
+            localStorage.setItem('datos_boveda_v1', JSON.stringify(datosApp));
+            dibujarTarjetas();
+            modalFormulario.classList.add('oculto');
+        });
+
+        document.getElementById('btn-cerrar-formulario').addEventListener('click', () => {
+            modalFormulario.classList.add('oculto');
+        });
+
+        // MODAL AJUSTES
+        document.getElementById('btn-abrir-ajustes').addEventListener('click', () => { modalAjustes.classList.remove('oculto'); });
+        document.getElementById('btn-cerrar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
+        document.getElementById('btn-guardar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
+
+        // PESTAÑAS DE NAVEGACIÓN
+        const vistas = {
+            'tab-claves': document.getElementById('vista-claves'),
+            'tab-papeles': document.getElementById('vista-papeles'),
+            'tab-escaner': document.getElementById('vista-escaner')
+        };
+
+        Object.keys(vistas).forEach(tabId => {
+            document.getElementById(tabId).addEventListener('click', () => {
+                document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('activo'));
+                Object.values(vistas).forEach(v => v.classList.add('oculto'));
+                
+                document.getElementById(tabId).classList.add('activo');
+                vistas[tabId].classList.remove('oculto');
+
+                if(tabId === 'tab-escaner') {
+                    iniciarCamara();
+                }
+            });
+        });
+
+        function alternarClave(idInput) {
+            const input = document.getElementById(idInput);
+            input.type = (input.type === "password") ? "text" : "password";
+        }
+
+        function copiarTexto(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                alert('¡Copiado con éxito!');
+            }).catch(err => { alert('Error: ' + err); });
+        }
+
+        // INICIALIZACIÓN
+        dibujarTarjetas();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('Service Worker OK'))
+                .catch((err) => console.log('Error SW: ', err));
+            });
+        }
+    </script>
+</body>
+</html>
