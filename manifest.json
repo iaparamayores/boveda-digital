@@ -3,12 +3,12 @@
   "name": "Bóveda Digital - iAparaMayores",
   "icons": [
     {
-      "src": "file_000000007760820ebe4b87c92c3be683.png",
+      "src": "./file_000000007760820ebe4b87c92c3be683.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "file_0000000057b8820eaa0a010ca4254b0e.png",
+      "src": "./file_0000000057b8820eaa0a010ca4254b0e.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boveda-v4';
+const CACHE_NAME = 'boveda-v8';
 
 const urlsToCache = [
   './',
