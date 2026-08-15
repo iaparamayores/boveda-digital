@@ -51,10 +51,11 @@
             padding: 10px 15px;
             border-bottom: 3px solid #E0E0E0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            gap: 5px;
         }
 
         .logo-boveda {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #004D40;
             flex-grow: 1;
@@ -65,8 +66,19 @@
             background-color: #D32F2F;
             color: white;
             border: none;
-            padding: 8px 14px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-cabecera-instalar {
+            background-color: #2E7D32;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
@@ -76,8 +88,8 @@
             background-color: #FFB300;
             color: black;
             border: none;
-            padding: 8px 14px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 13px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
@@ -187,6 +199,9 @@
             font-size: 15px;
             border-radius: 8px;
             font-weight: bold;
+            height: 44px !important;
+            max-height: 44px !important;
+            box-sizing: border-box !important;
         }
 
         .btn-copiar, .btn-ojo {
@@ -199,6 +214,7 @@
             border-radius: 8px;
             cursor: pointer;
             flex-shrink: 0;
+            height: 44px;
         }
 
         .btn-anadir {
@@ -391,10 +407,13 @@
             background-color: #F5F5F5;
         }
 
+        /* REGLA STRICTA PARA EL INPUT DEL PIN */
         #inp-pin {
             height: 48px !important;
             max-height: 48px !important;
             box-sizing: border-box !important;
+            display: block !important;
+            flex: none !important;
         }
     </style>
 </head>
@@ -404,6 +423,7 @@
     <header>
         <button class="btn-cabecera-salir" onclick="bloquearApp()">Salir</button>
         <div class="logo-boveda">Boveda Digital</div>
+        <button class="btn-cabecera-instalar oculto" id="btn-instalar-app" onclick="instalarApp()">Instalar</button>
         <button class="btn-cabecera-ajustes" id="btn-abrir-ajustes">Ajustes</button>
     </header>
 
@@ -485,10 +505,24 @@
                 <input type="text" id="inp-dato2" placeholder="Ingrese la clave o nota">
             </div>
 
-            <!-- CAMPO PARA SUBIR FOTO EN PAPELES -->
+            <!-- CAMPO PARA SUBIR O ESCANEAR FOTO EN PAPELES -->
             <div class="grupo-formulario oculto" id="grupo-foto-adjunta">
                 <label>Adjuntar Foto / Imagen:</label>
-                <input type="file" id="inp-foto" accept="image/*" style="padding: 5px; font-size: 12px; background: white;">
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <!-- Subir desde Galeria -->
+                    <label for="inp-foto" style="flex:1; background:#00796B; color:white; padding:8px; text-align:center; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; margin-bottom:0;">
+                        Galeria
+                    </label>
+                    <input type="file" id="inp-foto" accept="image/*" style="display:none;">
+
+                    <!-- Usar Escaner/Camara Directa -->
+                    <label for="inp-camara-directa" style="flex:1; background:#FFB300; color:black; padding:8px; text-align:center; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; margin-bottom:0;">
+                        Sacar Foto
+                    </label>
+                    <input type="file" id="inp-camara-directa" accept="image/*" capture="environment" style="display:none;">
+                </div>
+
                 <div id="preview-foto-modal" style="margin-top: 8px; text-align: center;"></div>
             </div>
 
@@ -534,7 +568,7 @@
         <div class="banner-publicidad-fantasma"></div>
     </div>
 
-    <!-- PANTALLA DE BLOQUEO -->
+    <!-- PANTALLA DE BLOQUEO CORREGIDA -->
     <div id="pantalla-bloqueo" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#004D40; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif;">
         <h2>Boveda Digital</h2>
         <p style="margin-top:10px;">Ingrese su PIN para continuar</p>
@@ -553,6 +587,27 @@
     </div>
 
     <script>
+        // MANEJO DE INSTALACION PWA
+        let diferidoPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            diferidoPrompt = e;
+            const btnInstalar = document.getElementById('btn-instalar-app');
+            if (btnInstalar) btnInstalar.classList.remove('oculto');
+        });
+
+        function instalarApp() {
+            if (diferidoPrompt) {
+                diferidoPrompt.prompt();
+                diferidoPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('btn-instalar-app').classList.add('oculto');
+                    }
+                    diferidoPrompt = null;
+                });
+            }
+        }
+
         // BASE DE DATOS LOCAL
         let datosApp = JSON.parse(localStorage.getItem('datos_boveda_v1')) || {
             claves: [
@@ -801,9 +856,9 @@
             window.location.href = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
         }
 
-        // LECTURA DE FOTO SUBIDA EN EL FORMULARIO
-        document.getElementById('inp-foto').addEventListener('change', function(e) {
-            const file = e.target.files[0];
+        // LECTURA DE FOTOS EN MODAL (GALERIA O CAMARA DIRECTA)
+        function procesarImagenModal(input) {
+            const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
@@ -813,14 +868,18 @@
                 };
                 reader.readAsDataURL(file);
             }
-        });
+        }
 
-        // FORMULARIOS (CREAR / EDITAR)
+        document.getElementById('inp-foto').addEventListener('change', function() { procesarImagenModal(this); });
+        document.getElementById('inp-camara-directa').addEventListener('change', function() { procesarImagenModal(this); });
+
+        // FORMULARIOS
         function abrirParaNueva(contexto) {
             document.getElementById('form-contexto').value = contexto;
             document.getElementById('form-indice-edicion').value = "";
             fotoTempModal = "";
             document.getElementById('inp-foto').value = "";
+            document.getElementById('inp-camara-directa').value = "";
             document.getElementById('preview-foto-modal').innerHTML = "";
             
             document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Anadir Credencial" : "Anadir Papel";
@@ -845,6 +904,7 @@
             document.getElementById('form-contexto').value = contexto;
             document.getElementById('form-indice-edicion').value = idx;
             document.getElementById('inp-foto').value = "";
+            document.getElementById('inp-camara-directa').value = "";
 
             const item = datosApp[contexto][idx];
             

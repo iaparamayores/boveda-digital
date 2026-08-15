@@ -1,20 +1,22 @@
 {
-  "name": "Bóveda Digital - iAparaMayores",
   "short_name": "Bóveda",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#F5F5F5",
-  "theme_color": "#00796B",
+  "name": "Bóveda Digital - iAparaMayores",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "file_000000007760820ebe4b87c92c3be683.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "icon-512.png",
+      "src": "file_0000000057b8820eaa0a010ca4254b0e.png",
+      "type": "image/png",
       "sizes": "512x512",
-      "type": "image/png"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#004D40",
+  "theme_color": "#004D40",
+  "display": "standalone",
+  "orientation": "portrait"
 }

@@ -1,18 +1,21 @@
-const CACHE_NAME = 'boveda-v3';
-const ASSETS = [
-  './index.html'
+const CACHE_NAME = 'boveda-v4';
+
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './file_000000007760820ebe4b87c92c3be683.png',
+  './file_0000000057b8820eaa0a010ca4254b0e.png'
 ];
 
-// Instalar la app en caché
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return cache.addAll(urlsToCache);
     })
   );
 });
 
-// Servir la app desde caché (sin internet)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
