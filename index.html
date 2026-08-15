@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bóveda Digital - iAparaMayores</title>
+    <title>Boveda Digital - iAparaMayores</title>
     <link rel="manifest" href="manifest.json">
     
     <style>
         /* ==========================================
-           1. ESTILOS BASE (DISEÑO CLARO TRADICIONAL)
+           1. ESTILOS BASE
            ========================================== */
         * {
             box-sizing: border-box;
@@ -266,6 +266,8 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .grupo-formulario {
@@ -385,8 +387,14 @@
         }
 
         .banner-publicidad-fantasma {
-            height: 70px;
+            height: 20px;
             background-color: #F5F5F5;
+        }
+
+        #inp-pin {
+            height: 48px !important;
+            max-height: 48px !important;
+            box-sizing: border-box !important;
         }
     </style>
 </head>
@@ -395,65 +403,63 @@
     <!-- CABECERA -->
     <header>
         <button class="btn-cabecera-salir" onclick="bloquearApp()">Salir</button>
-        <div class="logo-boveda">Bóveda Digital</div>
+        <div class="logo-boveda">Boveda Digital</div>
         <button class="btn-cabecera-ajustes" id="btn-abrir-ajustes">Ajustes</button>
     </header>
 
     <main id="app-principal" class="pantalla-completa">
         
-        <!-- SECCIÓN 1: CLAVES -->
+        <!-- SECCION 1: CLAVES -->
         <section id="vista-claves" class="vista-contenido">
             <h2>Mis Claves</h2>
             
             <div class="contenedor-carrusel">
-                <button class="btn-flecha" onclick="cambiarTarjetaClaves(-1)"></button>
+                <button class="btn-flecha" onclick="cambiarTarjetaClaves(-1)">&lt;</button>
                 <div id="dinamico-claves" style="display: contents;"></div>
-                <button class="btn-flecha" onclick="cambiarTarjetaClaves(1)"></button>
+                <button class="btn-flecha" onclick="cambiarTarjetaClaves(1)">&gt;</button>
             </div>
 
-            <button class="btn-anadir" onclick="abrirParaNueva('claves')"> Añadir Nueva</button>
+            <button class="btn-anadir" onclick="abrirParaNueva('claves')">+ Anadir Nueva</button>
         </section>
 
-        <!-- SECCIÓN 2: PAPELES -->
+        <!-- SECCION 2: PAPELES -->
         <section id="vista-papeles" class="vista-contenido oculto">
             <h2>Mis Papeles</h2>
             
             <div class="contenedor-carrusel">
-                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(-1)"></button>
+                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(-1)">&lt;</button>
                 <div id="dinamico-papeles" style="display: contents;"></div>
-                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(1)"></button>
+                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(1)">&gt;</button>
             </div>
 
-            <button class="btn-anadir" onclick="abrirParaNueva('papeles')"> Añadir Papel</button>
+            <button class="btn-anadir" onclick="abrirParaNueva('papeles')">+ Anadir Papel</button>
         </section>
 
-        <!-- SECCIÓN 3: ESCÁNER DE PAPELES -->
+        <!-- SECCION 3: ESCANER DE PAPELES -->
         <section id="vista-escaner" class="vista-contenido oculto">
-            <h2>Escáner de Papeles</h2>
+            <h2>Escaner de Papeles</h2>
             
-            <!-- Contenedor que agrupa la cámara y el marco -->
             <div style="position: relative; display: inline-block; width: 100%;">
                 <video id="video-camara" autoplay playsinline style="width: 100%; border-radius: 10px; background:#000;"></video>
                 
-                <!-- Recuadro guía amarillo -->
                 <div style="position: absolute; top: 12%; left: 10%; width: 80%; height: 76%; border: 3px dashed #FFB300; border-radius: 8px; pointer-events: none; box-sizing: border-box;">
                     <span style="color: black; background: #FFB300; padding: 2px 8px; font-size: 11px; font-weight: bold; position: absolute; top: 4px; left: 4px; border-radius: 3px;">
-                        Apoyá el papel aquí
+                        Apoye el papel aqui
                     </span>
                 </div>
             </div>
             
             <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="btn-modal guardar" onclick="tomarFoto()" style="flex:1; padding: 15px; font-size: 16px;"> Capturar</button>
+                <button class="btn-modal guardar" onclick="tomarFoto()" style="flex:1; padding: 15px; font-size: 16px;">Capturar Foto</button>
             </div>
 
             <canvas id="canvas-foto" style="display:none;"></canvas>
             <div id="resultado-foto" style="margin-top:15px; text-align:center;"></div>
 
-            <!-- BOTONES TRAS LA CAPTURA -->
             <div id="controles-foto" class="oculto" style="margin-top: 10px;">
-                <button class="btn-anadir" onclick="guardarFotoEnPapeles()" style="background:#388E3C; color:white;"> Guardar en Mis Papeles</button>
-                <button class="btn-anadir" onclick="enviarPorEmail()" style="background:#0288D1; color:white; margin-top: 5px;"> Enviar por Mail</button>
+                <button class="btn-anadir" onclick="guardarFotoEnPapeles()" style="background:#388E3C; color:white;">Guardar en Mis Papeles</button>
+                <button class="btn-anadir" onclick="copiarFotoCapturada()" style="background:#FFB300; color:black; margin-top: 5px;">Copiar Foto</button>
+                <button class="btn-anadir" onclick="enviarPorEmail()" style="background:#0288D1; color:white; margin-top: 5px;">Enviar por Mail</button>
             </div>
         </section>
     </main>
@@ -461,7 +467,7 @@
     <!-- MODAL 1: FORMULARIO -->
     <div id="modal-formulario" class="pantalla-modal oculto">
         <div class="contenido-modal" style="border-top: 8px solid #FFB300;">
-            <h3 id="titulo-modal" style="margin-bottom: 15px; color: #004D40;">Añadir Credencial</h3>
+            <h3 id="titulo-modal" style="margin-bottom: 15px; color: #004D40;">Anadir Credencial</h3>
             
             <input type="hidden" id="form-contexto">
             <input type="hidden" id="form-indice-edicion">
@@ -475,9 +481,17 @@
                 <input type="text" id="inp-dato1" placeholder="Ingrese el identificador">
             </div>
             <div class="grupo-formulario">
-                <label id="lbl-dato2">Contraseña o Detalle:</label>
+                <label id="lbl-dato2">Contrasena o Detalle:</label>
                 <input type="text" id="inp-dato2" placeholder="Ingrese la clave o nota">
             </div>
+
+            <!-- CAMPO PARA SUBIR FOTO EN PAPELES -->
+            <div class="grupo-formulario oculto" id="grupo-foto-adjunta">
+                <label>Adjuntar Foto / Imagen:</label>
+                <input type="file" id="inp-foto" accept="image/*" style="padding: 5px; font-size: 12px; background: white;">
+                <div id="preview-foto-modal" style="margin-top: 8px; text-align: center;"></div>
+            </div>
+
             <div class="bloque-botones-modal">
                 <button class="btn-modal cancelar" id="btn-cerrar-formulario">Cerrar</button>
                 <button class="btn-modal guardar" id="btn-guardar-formulario">Guardar</button>
@@ -489,10 +503,10 @@
     <div id="modal-ajustes" class="pantalla-modal oculto">
         <div class="contenido-modal" style="border-top: 8px solid #00796B;">
             <h3 style="margin-bottom: 15px; color: #004D40;">Seguridad de la App</h3>
-            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Configure sus métodos de acceso:</p>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Configure sus metodos de acceso:</p>
             
             <div class="opcion-ajuste"><input type="checkbox" checked> Huella Digital</div>
-            <div class="opcion-ajuste"><input type="checkbox" checked> Código PIN</div>
+            <div class="opcion-ajuste"><input type="checkbox" checked> Codigo PIN</div>
 
             <div class="bloque-botones-modal">
                 <button class="btn-modal cancelar" id="btn-cerrar-ajustes">Volver</button>
@@ -504,7 +518,7 @@
     <!-- ZONA INFERIOR -->
     <div class="zona-fija-inferior">
         <div class="bloque-acciones-rapidas">
-            <button class="btn-accion-redondo">Compartir</button>
+            <button class="btn-accion-redondo" onclick="copiarUltimoTexto()">Compartir</button>
             <button class="btn-accion-redondo" onclick="window.print()">Imprimir</button>
         </div>
         
@@ -515,26 +529,25 @@
         </nav>
 
         <div class="bloque-soporte">
-            Sugerencias o dudas comunícate con nosotros a <a href="mailto:iaparamayoresapp@gmail.com">iaparamayoresapp@gmail.com</a>
+            Sugerencias o dudas comunicate con nosotros a <a href="mailto:iaparamayoresapp@gmail.com">iaparamayoresapp@gmail.com</a>
         </div>
         <div class="banner-publicidad-fantasma"></div>
     </div>
 
-    <!-- PANTALLA DE BLOQUEO CON CONTROL ESTRICTO DE 2 INTENTOS -->
+    <!-- PANTALLA DE BLOQUEO -->
     <div id="pantalla-bloqueo" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#004D40; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif;">
-        <h2> Bóveda Digital</h2>
+        <h2>Boveda Digital</h2>
         <p style="margin-top:10px;">Ingrese su PIN para continuar</p>
-        <input type="password" id="inp-pin" style="width:200px; text-align:center; font-size:24px; letter-spacing:10px; margin:20px; color:black; background:white;" maxlength="4">
+        <input type="password" id="inp-pin" style="width:200px; text-align:center; font-size:24px; letter-spacing:10px; margin:20px; color:black; background:white; height:48px;" maxlength="4">
         <button id="btn-entrar-pin" onclick="validarPin()" style="padding:15px 30px; font-size:18px; border-radius:10px; border:none; background:#FFB300; font-weight:bold; cursor:pointer; color:black; width:200px;">Entrar</button>
 
-        <!-- OPCIONES DE SEGURIDAD -->
         <div style="margin-top: 25px; display: flex; gap: 15px;">
             <button type="button" onclick="cambiarPin()" style="background: transparent; border: none; color: #E0F2F1; text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
                 Cambiar PIN
             </button>
             <span style="color: #80CBC4;">|</span>
             <button type="button" onclick="olvidastePin()" style="background: transparent; border: none; color: #FF8A80; text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
-                ¿Olvidaste tu clave?
+                Olvidaste tu clave?
             </button>
         </div>
     </div>
@@ -543,12 +556,12 @@
         // BASE DE DATOS LOCAL
         let datosApp = JSON.parse(localStorage.getItem('datos_boveda_v1')) || {
             claves: [
-                { nombre: "Mi ANSES", icono: "", tag1: "CUIL:", dato1: "20-12345678-9", tag2: "Clave:", dato2: "ClaveAnses2026" },
-                { nombre: "Mi PAMI", icono: "", tag1: "User:", dato1: "afiliado_pami", tag2: "Clave:", dato2: "PamiClave987" },
-                { nombre: "Home Banking", icono: "", tag1: "DNI:", dato1: "12.345.678", tag2: "Clave:", dato2: "BancoClave2026" }
+                { nombre: "Mi ANSES", icono: "[K]", tag1: "CUIL:", dato1: "20-12345678-9", tag2: "Clave:", dato2: "ClaveAnses2026" },
+                { nombre: "Mi PAMI", icono: "[K]", tag1: "User:", dato1: "afiliado_pami", tag2: "Clave:", dato2: "PamiClave987" },
+                { nombre: "Home Banking", icono: "[K]", tag1: "DNI:", dato1: "12.345.678", tag2: "Clave:", dato2: "BancoClave2026" }
             ],
             papeles: [
-                { nombre: "Carnet PAMI", icono: "", tag1: "Nro Afiliado:", dato1: "1234567890", tag2: "Tipo:", dato2: "Salud", foto: "" }
+                { nombre: "Carnet PAMI", icono: "[P]", tag1: "Nro Afiliado:", dato1: "1234567890", tag2: "Tipo:", dato2: "Salud", foto: "" }
             ]
         };
 
@@ -556,11 +569,12 @@
         let indicePapeles = 0;
         let intentosPin = 0;
         let fotoCapturadaTemp = "";
+        let fotoTempModal = "";
 
         const modalFormulario = document.getElementById('modal-formulario');
         const modalAjustes = document.getElementById('modal-ajustes');
 
-        // SEGURIDAD PIN: BLOQUEO AL SEGUNDO INTENTO
+        // SEGURIDAD PIN
         function validarPin() {
             const pinIngresado = document.getElementById('inp-pin').value;
             const pinGuardado = localStorage.getItem('mi_pin_boveda') || "1234";
@@ -572,7 +586,7 @@
             } else {
                 intentosPin++;
                 if (intentosPin >= 2) {
-                    alert('¡ACCESO BLOQUEADO! Superó los 2 intentos fallidos por seguridad.');
+                    alert('ACCESO BLOQUEADO. Supero los 2 intentos fallidos por seguridad.');
                     document.getElementById('inp-pin').disabled = true;
                     document.getElementById('btn-entrar-pin').disabled = true;
                     document.getElementById('btn-entrar-pin').style.backgroundColor = "#CCCCCC";
@@ -587,36 +601,34 @@
             document.getElementById('pantalla-bloqueo').style.display = 'flex'; 
         }
 
-        // CAMBIAR PIN
         function cambiarPin() {
             const pinGuardado = localStorage.getItem('mi_pin_boveda') || "1234";
             
-            const pinActual = prompt("Ingresá tu PIN actual:");
+            const pinActual = prompt("Ingrese su PIN actual:");
             if (!pinActual) return;
 
             if (pinActual === pinGuardado) {
-                const nuevoPin = prompt("Ingresá tu nuevo PIN (4 dígitos):");
+                const nuevoPin = prompt("Ingrese su nuevo PIN (4 numeros):");
                 if (nuevoPin && nuevoPin.length === 4 && !isNaN(nuevoPin)) {
                     localStorage.setItem('mi_pin_boveda', nuevoPin);
-                    alert("¡PIN actualizado con éxito!");
+                    alert("PIN actualizado con exito.");
                     location.reload();
                 } else {
-                    alert("El nuevo PIN debe tener exactamente 4 números.");
+                    alert("El nuevo PIN debe tener exactamente 4 numeros.");
                 }
             } else {
-                alert("El PIN actual es incorrecto. No se puede cambiar la clave.");
+                alert("El PIN actual es incorrecto.");
             }
         }
 
-        // RECUPERACIÓN DE PIN
         function olvidastePin() {
             const confirmacion = confirm(
-                "Por razones de seguridad, si olvidaste tu PIN se restablecerá al número por defecto (1234).\n\n¿Deseas continuar?"
+                "Por seguridad, si olvido su PIN se restablecera al numero por defecto (1234).\n\nDesea continuar?"
             );
 
             if (confirmacion) {
                 localStorage.setItem('mi_pin_boveda', '1234');
-                alert("El PIN ha sido restablecido a '1234'. Podés ingresar ahora.");
+                alert("El PIN fue restablecido a '1234'. Puede ingresar ahora.");
                 location.reload();
             }
         }
@@ -638,7 +650,7 @@
                         divClaves.innerHTML += `
                             <div class="tarjeta-carrusel ${esActiva}">
                                 <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('claves', ${idx})">Editar</button>
-                                <div class="header-tarjeta"><span>${c.icono || ''}</span> ${c.nombre}</div>
+                                <div class="header-tarjeta"><span>${c.icono || ''}</span> ${c.nombre}</div>
                                 <div class="campo-tarjeta">
                                     <span class="etiqueta">${c.tag1 || 'User:'}</span>
                                     <input type="text" value="${c.dato1}" readonly>
@@ -647,7 +659,7 @@
                                 <div class="campo-tarjeta">
                                     <span class="etiqueta">${c.tag2 || 'Clave:'}</span>
                                     <input type="password" value="${c.dato2}" id="pass-dinamica-c-${idx}" readonly>
-                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')"></button>
+                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')">Ver</button>
                                     <button class="btn-copiar" onclick="copiarTexto('${c.dato2}')">Copiar</button>
                                 </div>
                             </div>
@@ -670,12 +682,12 @@
                         const esActiva = (idx === indicePapeles) ? 'activa' : '';
                         const vistaFoto = p.foto 
                             ? `<img src="${p.foto}" style="max-width:100%; max-height:160px; border-radius:6px;">` 
-                            : ` [ Sin foto adjunta ]`;
+                            : `<span style="font-size:13px;">[ Sin imagen cargada ]</span>`;
 
                         divPapeles.innerHTML += `
                             <div class="tarjeta-carrusel ${esActiva}" style="border-top-color: #00E676; border-color: #00E676; max-width: 100%; width: 100%; flex-shrink:0;">
                                 <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('papeles', ${idx})">Editar</button>
-                                <div class="header-tarjeta"><span>${p.icono || ''}</span> ${p.nombre}</div>
+                                <div class="header-tarjeta"><span>${p.icono || ''}</span> ${p.nombre}</div>
                                 <div class="foto-placeholder">${vistaFoto}</div>
                                 <div style="margin-top: 10px;">
                                     <span class="etiqueta" style="width:100%;">${p.tag1 || 'Nro Doc:'}</span>
@@ -703,14 +715,14 @@
             dibujarTarjetas();
         }
 
-        // CÁMARA Y ESCÁNER
+        // CAMARA Y ESCANER
         const video = document.getElementById('video-camara');
         
         function iniciarCamara() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                     .then(stream => { video.srcObject = stream; })
-                    .catch(err => { console.error("Error al acceder a la cámara: ", err); });
+                    .catch(err => { console.error("Error al acceder a la camara: ", err); });
             }
         }
 
@@ -721,7 +733,6 @@
             const anchoOriginal = video.videoWidth || 640;
             const altoOriginal = video.videoHeight || 480;
 
-            // Recortes de márgenes (10% a los lados, 12% arriba y abajo)
             const margenX = anchoOriginal * 0.10;
             const margenY = altoOriginal * 0.12;
 
@@ -742,7 +753,7 @@
             document.getElementById('resultado-foto').innerHTML = `
                 <div style="text-align:center;">
                     <img src="${fotoCapturadaTemp}" style="width:100%; border-radius:10px; border:2px solid #00796B; box-shadow:0 4px 10px rgba(0,0,0,0.15);">
-                    <small style="color:#00796B; font-weight:bold; display:block; margin-top:5px;"> Borde recortado y documento enfocado</small>
+                    <small style="color:#00796B; font-weight:bold; display:block; margin-top:5px;">Documento recortado y listo</small>
                 </div>
             `;
             document.getElementById('controles-foto').classList.remove('oculto');
@@ -753,42 +764,79 @@
             
             datosApp.papeles.push({ 
                 nombre: "Documento Escaneado", 
-                icono: "", 
+                icono: "[P]", 
                 tag1: "Fecha:", 
                 dato1: new Date().toLocaleDateString(), 
                 tag2: "Tipo:", 
-                dato2: "Capturado desde Escáner",
+                dato2: "Capturado desde Escaner",
                 foto: fotoCapturadaTemp
             });
             
             localStorage.setItem('datos_boveda_v1', JSON.stringify(datosApp));
-            alert("¡Documento guardado con éxito en 'Mis Papeles'!");
+            alert("Documento guardado con exito en Mis Papeles.");
             
             document.getElementById('tab-papeles').click();
             indicePapeles = datosApp.papeles.length - 1;
             dibujarTarjetas();
         }
 
-        function enviarPorEmail() {
-            const asunto = "Documento Escaneado - Bóveda Digital";
-            const cuerpo = "Adjunto el documento recién escaneado desde mi aplicación.";
-            window.location.href = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-            alert("Se abrirá tu correo. ¡Recuerda adjuntar la foto capturada!");
+        function copiarFotoCapturada() {
+            if(!fotoCapturadaTemp) return;
+            
+            fetch(fotoCapturadaTemp)
+                .then(res => res.blob())
+                .then(blob => {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    navigator.clipboard.write([item]).then(() => {
+                        alert("Foto copiada al portapapeles con exito.");
+                    }).catch(() => {
+                        alert("No se pudo copiar la imagen directamente. Podes usar 'Enviar por Mail' o 'Guardar'.");
+                    });
+                });
         }
 
-        // FORMULARIOS
+        function enviarPorEmail() {
+            const asunto = "Documento Escaneado - Boveda Digital";
+            const cuerpo = "Adjunto el documento recien escaneado desde mi aplicacion.";
+            window.location.href = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+        }
+
+        // LECTURA DE FOTO SUBIDA EN EL FORMULARIO
+        document.getElementById('inp-foto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    fotoTempModal = evt.target.result;
+                    document.getElementById('preview-foto-modal').innerHTML = 
+                        `<img src="${fotoTempModal}" style="max-width:100%; max-height:120px; border-radius:6px; border:2px solid #00796B;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // FORMULARIOS (CREAR / EDITAR)
         function abrirParaNueva(contexto) {
             document.getElementById('form-contexto').value = contexto;
             document.getElementById('form-indice-edicion').value = "";
+            fotoTempModal = "";
+            document.getElementById('inp-foto').value = "";
+            document.getElementById('preview-foto-modal').innerHTML = "";
             
-            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Añadir Credencial" : "Añadir Papel";
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Anadir Credencial" : "Anadir Papel";
             document.getElementById('lbl-nombre').innerText = "Nombre del Servicio o Papel:";
-            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número de Documento:";
-            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Tipo / Notas Adicionales:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Numero de Documento:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contrasena:" : "Tipo / Notas Adicionales:";
 
             document.getElementById('inp-nombre').value = "";
             document.getElementById('inp-dato1').value = "";
             document.getElementById('inp-dato2').value = "";
+
+            if(contexto === 'papeles') {
+                document.getElementById('grupo-foto-adjunta').classList.remove('oculto');
+            } else {
+                document.getElementById('grupo-foto-adjunta').classList.add('oculto');
+            }
 
             modalFormulario.classList.remove('oculto');
         }
@@ -796,17 +844,31 @@
         function abrirParaEditar(contexto, idx) {
             document.getElementById('form-contexto').value = contexto;
             document.getElementById('form-indice-edicion').value = idx;
+            document.getElementById('inp-foto').value = "";
 
             const item = datosApp[contexto][idx];
             
             document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Editar Credencial" : "Editar Papel";
             document.getElementById('lbl-nombre').innerText = "Nombre del Servicio o Papel:";
-            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número de Documento:";
-            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Tipo / Notas Adicionales:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Numero de Documento:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contrasena:" : "Tipo / Notas Adicionales:";
 
             document.getElementById('inp-nombre').value = item.nombre;
             document.getElementById('inp-dato1').value = item.dato1;
             document.getElementById('inp-dato2').value = item.dato2;
+
+            if(contexto === 'papeles') {
+                document.getElementById('grupo-foto-adjunta').classList.remove('oculto');
+                fotoTempModal = item.foto || "";
+                if(fotoTempModal) {
+                    document.getElementById('preview-foto-modal').innerHTML = 
+                        `<img src="${fotoTempModal}" style="max-width:100%; max-height:120px; border-radius:6px; border:2px solid #00796B;">`;
+                } else {
+                    document.getElementById('preview-foto-modal').innerHTML = `<small style="color:#777;">Sin foto guardada</small>`;
+                }
+            } else {
+                document.getElementById('grupo-foto-adjunta').classList.add('oculto');
+            }
 
             modalFormulario.classList.remove('oculto');
         }
@@ -826,10 +888,10 @@
 
             if(indiceEdicion === "") {
                 if(contexto === 'claves') {
-                    datosApp.claves.push({ nombre: nom, icono: "", tag1: "User:", dato1: d1, tag2: "Clave:", dato2: d2 });
+                    datosApp.claves.push({ nombre: nom, icono: "[K]", tag1: "User:", dato1: d1, tag2: "Clave:", dato2: d2 });
                     indiceClaves = datosApp.claves.length - 1;
                 } else {
-                    datosApp.papeles.push({ nombre: nom, icono: "", tag1: "Nro Afiliado:", dato1: d1, tag2: "Nota:", dato2: d2, foto: "" });
+                    datosApp.papeles.push({ nombre: nom, icono: "[P]", tag1: "Nro Afiliado:", dato1: d1, tag2: "Nota:", dato2: d2, foto: fotoTempModal });
                     indicePapeles = datosApp.papeles.length - 1;
                 }
             } else {
@@ -837,6 +899,9 @@
                 datosApp[contexto][idx].nombre = nom;
                 datosApp[contexto][idx].dato1 = d1;
                 datosApp[contexto][idx].dato2 = d2;
+                if(contexto === 'papeles') {
+                    datosApp[contexto][idx].foto = fotoTempModal;
+                }
             }
 
             localStorage.setItem('datos_boveda_v1', JSON.stringify(datosApp));
@@ -853,7 +918,7 @@
         document.getElementById('btn-cerrar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
         document.getElementById('btn-guardar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
 
-        // PESTAÑAS DE NAVEGACIÓN
+        // PESTANAS DE NAVEGACION
         const vistas = {
             'tab-claves': document.getElementById('vista-claves'),
             'tab-papeles': document.getElementById('vista-papeles'),
@@ -881,11 +946,18 @@
 
         function copiarTexto(texto) {
             navigator.clipboard.writeText(texto).then(() => {
-                alert('¡Copiado con éxito!');
+                alert('Copiado con exito.');
             }).catch(err => { alert('Error: ' + err); });
         }
 
-        // INICIALIZACIÓN
+        function copiarUltimoTexto() {
+            if(datosApp.claves[indiceClaves]) {
+                const d = datosApp.claves[indiceClaves];
+                copiarTexto(`${d.nombre} - ${d.tag1} ${d.dato1} | ${d.tag2} ${d.dato2}`);
+            }
+        }
+
+        // INICIALIZACION
         dibujarTarjetas();
 
         if ('serviceWorker' in navigator) {
