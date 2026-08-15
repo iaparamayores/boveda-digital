@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda Digital - iAparaMayores</title>
+    <title>Bóveda Digital - iAparaMayores</title>
     <link rel="manifest" href="manifest.json">
     
     <style>
@@ -199,9 +199,9 @@
             font-size: 15px;
             border-radius: 8px;
             font-weight: bold;
-            height: 44px !important;
-            max-height: 44px !important;
-            box-sizing: border-box !important;
+            height: 44px;
+            max-height: 44px;
+            box-sizing: border-box;
         }
 
         .btn-copiar, .btn-ojo {
@@ -259,7 +259,7 @@
         }
 
         /* ==========================================
-           4. MODALES
+           4. MODALES Y SEGURIDAD (PIN)
            ========================================== */
         .pantalla-modal {
             position: fixed;
@@ -327,6 +327,42 @@
             margin-bottom: 10px;
             font-weight: bold;
             color: #333;
+        }
+
+        /* REGLA STRICTA PARA EL INPUT DEL PIN Y PANTALLA DE BLOQUEO */
+        #pantalla-bloqueo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #004D40;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        #inp-pin {
+            width: 200px !important;
+            max-width: 200px !important;
+            height: 48px !important;
+            max-height: 48px !important;
+            line-height: 48px !important;
+            font-size: 24px !important;
+            letter-spacing: 10px !important;
+            text-align: center !important;
+            margin: 20px auto !important;
+            color: #000000 !important;
+            background: #FFFFFF !important;
+            border: 2px solid #FFB300 !important;
+            border-radius: 8px !important;
+            box-sizing: border-box !important;
+            display: block !important;
+            flex: none !important;
         }
 
         /* ==========================================
@@ -406,15 +442,6 @@
             height: 20px;
             background-color: #F5F5F5;
         }
-
-        /* REGLA STRICTA PARA EL INPUT DEL PIN */
-        #inp-pin {
-            height: 48px !important;
-            max-height: 48px !important;
-            box-sizing: border-box !important;
-            display: block !important;
-            flex: none !important;
-        }
     </style>
 </head>
 <body>
@@ -422,14 +449,14 @@
     <!-- CABECERA -->
     <header>
         <button class="btn-cabecera-salir" onclick="bloquearApp()">Salir</button>
-        <div class="logo-boveda">Boveda Digital</div>
+        <div class="logo-boveda">Bóveda Digital</div>
         <button class="btn-cabecera-instalar oculto" id="btn-instalar-app" onclick="instalarApp()">Instalar</button>
         <button class="btn-cabecera-ajustes" id="btn-abrir-ajustes">Ajustes</button>
     </header>
 
     <main id="app-principal" class="pantalla-completa">
         
-        <!-- SECCION 1: CLAVES -->
+        <!-- SECCIÓN 1: CLAVES -->
         <section id="vista-claves" class="vista-contenido">
             <h2>Mis Claves</h2>
             
@@ -439,10 +466,10 @@
                 <button class="btn-flecha" onclick="cambiarTarjetaClaves(1)">&gt;</button>
             </div>
 
-            <button class="btn-anadir" onclick="abrirParaNueva('claves')">+ Anadir Nueva</button>
+            <button class="btn-anadir" onclick="abrirParaNueva('claves')">+ Añadir Nueva</button>
         </section>
 
-        <!-- SECCION 2: PAPELES -->
+        <!-- SECCIÓN 2: PAPELES -->
         <section id="vista-papeles" class="vista-contenido oculto">
             <h2>Mis Papeles</h2>
             
@@ -452,19 +479,19 @@
                 <button class="btn-flecha" onclick="cambiarTarjetaPapeles(1)">&gt;</button>
             </div>
 
-            <button class="btn-anadir" onclick="abrirParaNueva('papeles')">+ Anadir Papel</button>
+            <button class="btn-anadir" onclick="abrirParaNueva('papeles')">+ Añadir Papel</button>
         </section>
 
-        <!-- SECCION 3: ESCANER DE PAPELES -->
+        <!-- SECCIÓN 3: ESCÁNER DE PAPELES -->
         <section id="vista-escaner" class="vista-contenido oculto">
-            <h2>Escaner de Papeles</h2>
+            <h2>Escáner de Papeles</h2>
             
             <div style="position: relative; display: inline-block; width: 100%;">
                 <video id="video-camara" autoplay playsinline style="width: 100%; border-radius: 10px; background:#000;"></video>
                 
                 <div style="position: absolute; top: 12%; left: 10%; width: 80%; height: 76%; border: 3px dashed #FFB300; border-radius: 8px; pointer-events: none; box-sizing: border-box;">
                     <span style="color: black; background: #FFB300; padding: 2px 8px; font-size: 11px; font-weight: bold; position: absolute; top: 4px; left: 4px; border-radius: 3px;">
-                        Apoye el papel aqui
+                        Apoye el papel aquí
                     </span>
                 </div>
             </div>
@@ -487,7 +514,7 @@
     <!-- MODAL 1: FORMULARIO -->
     <div id="modal-formulario" class="pantalla-modal oculto">
         <div class="contenido-modal" style="border-top: 8px solid #FFB300;">
-            <h3 id="titulo-modal" style="margin-bottom: 15px; color: #004D40;">Anadir Credencial</h3>
+            <h3 id="titulo-modal" style="margin-bottom: 15px; color: #004D40;">Añadir Credencial</h3>
             
             <input type="hidden" id="form-contexto">
             <input type="hidden" id="form-indice-edicion">
@@ -501,7 +528,7 @@
                 <input type="text" id="inp-dato1" placeholder="Ingrese el identificador">
             </div>
             <div class="grupo-formulario">
-                <label id="lbl-dato2">Contrasena o Detalle:</label>
+                <label id="lbl-dato2">Contraseña o Detalle:</label>
                 <input type="text" id="inp-dato2" placeholder="Ingrese la clave o nota">
             </div>
 
@@ -510,13 +537,13 @@
                 <label>Adjuntar Foto / Imagen:</label>
                 
                 <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <!-- Subir desde Galeria -->
+                    <!-- Subir desde Galería -->
                     <label for="inp-foto" style="flex:1; background:#00796B; color:white; padding:8px; text-align:center; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; margin-bottom:0;">
-                        Galeria
+                        Galería
                     </label>
                     <input type="file" id="inp-foto" accept="image/*" style="display:none;">
 
-                    <!-- Usar Escaner/Camara Directa -->
+                    <!-- Usar Escáner/Cámara Directa -->
                     <label for="inp-camara-directa" style="flex:1; background:#FFB300; color:black; padding:8px; text-align:center; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; margin-bottom:0;">
                         Sacar Foto
                     </label>
@@ -537,10 +564,10 @@
     <div id="modal-ajustes" class="pantalla-modal oculto">
         <div class="contenido-modal" style="border-top: 8px solid #00796B;">
             <h3 style="margin-bottom: 15px; color: #004D40;">Seguridad de la App</h3>
-            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Configure sus metodos de acceso:</p>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Configure sus métodos de acceso:</p>
             
             <div class="opcion-ajuste"><input type="checkbox" checked> Huella Digital</div>
-            <div class="opcion-ajuste"><input type="checkbox" checked> Codigo PIN</div>
+            <div class="opcion-ajuste"><input type="checkbox" checked> Código PIN</div>
 
             <div class="bloque-botones-modal">
                 <button class="btn-modal cancelar" id="btn-cerrar-ajustes">Volver</button>
@@ -569,10 +596,10 @@
     </div>
 
     <!-- PANTALLA DE BLOQUEO CORREGIDA -->
-    <div id="pantalla-bloqueo" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#004D40; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif;">
-        <h2>Boveda Digital</h2>
+    <div id="pantalla-bloqueo">
+        <h2>Bóveda Digital</h2>
         <p style="margin-top:10px;">Ingrese su PIN para continuar</p>
-        <input type="password" id="inp-pin" style="width:200px; text-align:center; font-size:24px; letter-spacing:10px; margin:20px; color:black; background:white; height:48px;" maxlength="4">
+        <input type="password" id="inp-pin" maxlength="4" placeholder="••••">
         <button id="btn-entrar-pin" onclick="validarPin()" style="padding:15px 30px; font-size:18px; border-radius:10px; border:none; background:#FFB300; font-weight:bold; cursor:pointer; color:black; width:200px;">Entrar</button>
 
         <div style="margin-top: 25px; display: flex; gap: 15px;">
@@ -581,13 +608,13 @@
             </button>
             <span style="color: #80CBC4;">|</span>
             <button type="button" onclick="olvidastePin()" style="background: transparent; border: none; color: #FF8A80; text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
-                Olvidaste tu clave?
+                ¿Olvidaste tu clave?
             </button>
         </div>
     </div>
 
     <script>
-        // MANEJO DE INSTALACION PWA
+        // MANEJO DE INSTALACIÓN PWA
         let diferidoPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -641,7 +668,7 @@
             } else {
                 intentosPin++;
                 if (intentosPin >= 2) {
-                    alert('ACCESO BLOQUEADO. Supero los 2 intentos fallidos por seguridad.');
+                    alert('ACCESO BLOQUEADO. Superó los 2 intentos fallidos por seguridad.');
                     document.getElementById('inp-pin').disabled = true;
                     document.getElementById('btn-entrar-pin').disabled = true;
                     document.getElementById('btn-entrar-pin').style.backgroundColor = "#CCCCCC";
@@ -663,13 +690,13 @@
             if (!pinActual) return;
 
             if (pinActual === pinGuardado) {
-                const nuevoPin = prompt("Ingrese su nuevo PIN (4 numeros):");
+                const nuevoPin = prompt("Ingrese su nuevo PIN (4 números):");
                 if (nuevoPin && nuevoPin.length === 4 && !isNaN(nuevoPin)) {
                     localStorage.setItem('mi_pin_boveda', nuevoPin);
-                    alert("PIN actualizado con exito.");
+                    alert("PIN actualizado con éxito.");
                     location.reload();
                 } else {
-                    alert("El nuevo PIN debe tener exactamente 4 numeros.");
+                    alert("El nuevo PIN debe tener exactamente 4 números.");
                 }
             } else {
                 alert("El PIN actual es incorrecto.");
@@ -678,7 +705,7 @@
 
         function olvidastePin() {
             const confirmacion = confirm(
-                "Por seguridad, si olvido su PIN se restablecera al numero por defecto (1234).\n\nDesea continuar?"
+                "Por seguridad, si olvidó su PIN se restablecerá al número por defecto (1234).\n\n¿Desea continuar?"
             );
 
             if (confirmacion) {
@@ -770,14 +797,14 @@
             dibujarTarjetas();
         }
 
-        // CAMARA Y ESCANER
+        // CÁMARA Y ESCÁNER
         const video = document.getElementById('video-camara');
         
         function iniciarCamara() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                     .then(stream => { video.srcObject = stream; })
-                    .catch(err => { console.error("Error al acceder a la camara: ", err); });
+                    .catch(err => { console.error("Error al acceder a la cámara: ", err); });
             }
         }
 
@@ -823,12 +850,12 @@
                 tag1: "Fecha:", 
                 dato1: new Date().toLocaleDateString(), 
                 tag2: "Tipo:", 
-                dato2: "Capturado desde Escaner",
+                dato2: "Capturado desde Escáner",
                 foto: fotoCapturadaTemp
             });
             
             localStorage.setItem('datos_boveda_v1', JSON.stringify(datosApp));
-            alert("Documento guardado con exito en Mis Papeles.");
+            alert("Documento guardado con éxito en Mis Papeles.");
             
             document.getElementById('tab-papeles').click();
             indicePapeles = datosApp.papeles.length - 1;
@@ -843,20 +870,20 @@
                 .then(blob => {
                     const item = new ClipboardItem({ 'image/png': blob });
                     navigator.clipboard.write([item]).then(() => {
-                        alert("Foto copiada al portapapeles con exito.");
+                        alert("Foto copiada al portapapeles con éxito.");
                     }).catch(() => {
-                        alert("No se pudo copiar la imagen directamente. Podes usar 'Enviar por Mail' o 'Guardar'.");
+                        alert("No se pudo copiar la imagen directamente. Podés usar 'Enviar por Mail' o 'Guardar'.");
                     });
                 });
         }
 
         function enviarPorEmail() {
-            const asunto = "Documento Escaneado - Boveda Digital";
-            const cuerpo = "Adjunto el documento recien escaneado desde mi aplicacion.";
+            const asunto = "Documento Escaneado - Bóveda Digital";
+            const cuerpo = "Adjunto el documento recién escaneado desde mi aplicación.";
             window.location.href = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
         }
 
-        // LECTURA DE FOTOS EN MODAL (GALERIA O CAMARA DIRECTA)
+        // LECTURA DE FOTOS EN MODAL (GALERÍA O CÁMARA DIRECTA)
         function procesarImagenModal(input) {
             const file = input.files[0];
             if (file) {
@@ -882,10 +909,10 @@
             document.getElementById('inp-camara-directa').value = "";
             document.getElementById('preview-foto-modal').innerHTML = "";
             
-            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Anadir Credencial" : "Anadir Papel";
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Añadir Credencial" : "Añadir Papel";
             document.getElementById('lbl-nombre').innerText = "Nombre del Servicio o Papel:";
-            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Numero de Documento:";
-            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contrasena:" : "Tipo / Notas Adicionales:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número de Documento:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Tipo / Notas Adicionales:";
 
             document.getElementById('inp-nombre').value = "";
             document.getElementById('inp-dato1').value = "";
@@ -910,8 +937,8 @@
             
             document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "Editar Credencial" : "Editar Papel";
             document.getElementById('lbl-nombre').innerText = "Nombre del Servicio o Papel:";
-            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Numero de Documento:";
-            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contrasena:" : "Tipo / Notas Adicionales:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número de Documento:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Tipo / Notas Adicionales:";
 
             document.getElementById('inp-nombre').value = item.nombre;
             document.getElementById('inp-dato1').value = item.dato1;
@@ -978,7 +1005,7 @@
         document.getElementById('btn-cerrar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
         document.getElementById('btn-guardar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
 
-        // PESTANAS DE NAVEGACION
+        // PESTAÑAS DE NAVEGACIÓN
         const vistas = {
             'tab-claves': document.getElementById('vista-claves'),
             'tab-papeles': document.getElementById('vista-papeles'),
@@ -1006,7 +1033,7 @@
 
         function copiarTexto(texto) {
             navigator.clipboard.writeText(texto).then(() => {
-                alert('Copiado con exito.');
+                alert('Copiado con éxito.');
             }).catch(err => { alert('Error: ' + err); });
         }
 
@@ -1017,7 +1044,7 @@
             }
         }
 
-        // INICIALIZACION
+        // INICIALIZACIÓN
         dibujarTarjetas();
 
         if ('serviceWorker' in navigator) {
