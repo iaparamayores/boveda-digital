@@ -1,25 +1,29 @@
-const CACHE_NAME = 'boveda-v9';
+const VERSION = 'v6';
+const CACHE_NAME = `circulo-vital-${VERSION}`;
+const APP_SHELL = ['./', './index.html', './manifest.json'];
 
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './file_000000007760820ebe4b87c92c3be683.png',
-  './file_0000000057b8820eaa0a010ca4254b0e.png'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(APP_SHELL)));
+  self.skipWaiting();
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+
+self.addEventListener('fetch', e => {
+  const r = e.request;
+  if (r.method !== 'GET' || !r.url.startsWith('http')) return;
+  if (r.mode === 'navigate' || r.destination === 'document') {
+    e.respondWith(fetch(r).then(res => {
+      const c = res.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put('./index.html', c));
+      return res;
+    }).catch(() => caches.match('./index.html')));
+    return;
+  }
+  e.respondWith(caches.match(r).then(c => c || fetch(r).then(res => {
+    if (res.ok) { const c = res.clone(); caches.open(CACHE_NAME).then(cache => cache.put(r, c)); }
+    return res;
+  })));
 });
