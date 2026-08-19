@@ -3,722 +3,1611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Círculo Vital</title>
-    <meta name="theme-color" content="#059669">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Círculo Vital">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./icon-192.png">
-    <link rel="apple-touch-icon" href="./icon-512.png">
-
+    <title>Cartera Digital - iAparaMayores</title>
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Librería para generar códigos QR (desde CDN, sin servidor) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
-        :root { --primary: #059669; --bg-light: #f0fdf4; --text-dark: #1f2937; --danger: #dc2626; --budget-color: #2563eb; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
-
-        #pantalla-alarma {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            z-index: 300; display: none; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
-            text-align: center; padding: 2rem;
+        /* ==========================================
+           1. ESTILOS BASE
+           ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
-        #pantalla-alarma.activa { display: flex; }
-        .alarma-icono { font-size: 5rem; margin-bottom: 1rem; animation: pulse 1s ease-in-out infinite; }
-        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-        .alarma-botones { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; width: 100%; max-width: 300px; }
-        .btn-alarma-tomar { background: white; color: #059669; border: none; padding: 1.25rem; border-radius: 1rem; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
-        .btn-alarma-posponer { background: rgba(255,255,255,0.15); color: white; border: 2px solid rgba(255,255,255,0.4); padding: 1rem; border-radius: 1rem; font-size: 1rem; cursor: pointer; }
 
-        header { background-color: #111827; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-        .logo-container { display: flex; align-items: center; gap: 0.5rem; }
-        header h1 { font-size: 1.2rem; font-weight: 600; }
-        .nav-buttons { display: flex; gap: 0.4rem; }
-        .btn-nav { background: #374151; color: white; border: none; padding: 0.4rem 0.7rem; border-radius: 0.375rem; cursor: pointer; font-size: 0.85rem; }
-        .btn-install { background: var(--primary); color: white; font-weight: bold; display: none; }
+        body {
+            background-color: #F5F5F5;
+            color: #1A1A1A;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-        main { flex: 1; padding: 1rem; max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
-        .solapas-container { display: flex; gap: 0.35rem; margin-bottom: 0.5rem; }
-        .btn-solapa { flex: 1; background: #e5e7eb; color: #4b5563; border: none; padding: 0.85rem 0.5rem; border-radius: 0.75rem; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
-        .btn-solapa.active { background: var(--primary); color: white; }
-        .vista-solapa { display: none; flex-direction: column; gap: 1rem; }
-        .vista-solapa.active { display: flex; }
+        .pantalla-completa {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            padding-bottom: 250px;
+            overflow-y: auto;
+            height: calc(100vh - 120px);
+        }
 
-        .section-card { background: white; padding: 1.25rem; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .section-card h2 { font-size: 1.1rem; margin-bottom: 0.75rem; color: #111827; border-bottom: 2px solid #f3f4f6; padding-bottom: 0.25rem; }
+        .oculto {
+            display: none !important;
+        }
 
-        .btn-sos { background-color: var(--danger); color: white; width: 85px; height: 85px; border-radius: 50%; border: 4px solid #fecaca; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        /* ==========================================
+           2. CABECERA
+           ========================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FFFFFF;
+            padding: 10px 15px;
+            border-bottom: 3px solid #E0E0E0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            gap: 5px;
+        }
 
-        .wallet-display { text-align: center; padding: 1rem 0; }
-        .wallet-monto { font-size: 2.25rem; font-weight: 800; color: #111827; margin: 0.25rem 0; }
-        .progress-bar-container { background-color: #e5e7eb; border-radius: 1rem; height: 16px; width: 100%; overflow: hidden; margin-top: 0.75rem; }
-        .progress-bar-fill { background-color: #10b981; height: 100%; width: 100%; transition: width 0.4s, background-color 0.4s; }
+        .logo-boveda {
+            font-size: 18px;
+            font-weight: bold;
+            color: #004D40;
+            flex-grow: 1;
+            text-align: center;
+        }
 
-        #toast-notification { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: #111827; color: white; padding: 0.75rem 1.5rem; border-radius: 2rem; font-size: 0.95rem; font-weight: 600; z-index: 1000; opacity: 0; transition: all 0.4s; white-space: nowrap; }
-        #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .btn-cabecera-salir {
+            background-color: #D32F2F;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-        .med-warning-card { background-color: #fff1f2; border: 2px solid #fecdd3; padding: 1rem; border-radius: 0.75rem; margin-bottom: 0.5rem; display: none; }
-        .btn-whatsapp { background-color: #25d366; color: white; border: none; padding: 0.6rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; text-decoration: none; font-size: 0.9rem; }
+        .btn-cabecera-instalar {
+            background-color: #2E7D32;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; color: #4b5563; }
-        .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; }
-        .btn-submit { background-color: var(--primary); color: white; border: none; width: 100%; padding: 0.75rem; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-cabecera-ajustes {
+            background-color: #FFB300;
+            color: black;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-        .overlay-screen { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100% - 60px); background-color: white; z-index: 100; display: none; flex-direction: column; padding: 1rem; overflow-y: auto; }
-        .overlay-screen.activa { display: flex; }
+        h2 {
+            font-size: 24px;
+            text-align: center;
+            margin: 10px 0;
+            color: #004D40;
+        }
 
-        .agenda-card { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #4dabf7; display: flex; justify-content: space-between; align-items: center; }
-        .med-card { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #0ca678; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .expense-card { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; border-left: 5px solid #f59e0b; display: flex; justify-content: space-between; align-items: center; }
-        .btn-action { background: #0ca678; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+        /* ==========================================
+           3. CARRUSEL Y TARJETAS
+           ========================================== */
+        .contenedor-carrusel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 100vw;
+            overflow: hidden;
+        }
 
-        .voice-btn-container { text-align: center; margin-bottom: 0.25rem; }
-        .btn-voice { background-color: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 2rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; }
-        .btn-voice.listening { background-color: var(--danger); }
+        .btn-flecha {
+            background-color: #00796B;
+            color: white;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            width: 40px;
+            height: 55px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
 
-        footer { text-align: center; padding: 1.5rem 1rem; background-color: #111827; color: #9ca3af; font-size: 0.85rem; border-top: 3px solid var(--primary); }
-        footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .tarjeta-carrusel {
+            flex: 1;
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 15px;
+            border: 3px solid #00796B;
+            border-top: 8px solid #00796B;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            max-width: calc(100% - 90px);
+            display: none;
+            position: relative;
+        }
 
-        .backup-container { background-color: #f3f4f6; border: 1px dashed #d1d5db; padding: 1rem; border-radius: 0.75rem; margin-top: 1.5rem; }
+        .tarjeta-carrusel.activa {
+            display: block;
+        }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-overlay.show { display: flex; }
-        .modal-box { background: white; border-radius: 1rem; padding: 1.5rem; max-width: 320px; width: 100%; text-align: center; }
-        .modal-box p { color: #1f2937; font-size: 1rem; margin-bottom: 1.25rem; }
-        .modal-botones { display: flex; gap: 0.75rem; }
-        .modal-botones button { flex: 1; padding: 0.75rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; }
-        .modal-botones .btn-cancelar { background: #e5e7eb; color: #4b5563; }
-        .modal-botones .btn-confirmar { background: var(--danger); color: white; }
+        .header-tarjeta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            padding-right: 65px;
+        }
+
+        .btn-editar-tarjeta-texto {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .campo-tarjeta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .etiqueta {
+            font-size: 13px;
+            font-weight: bold;
+            color: #555555;
+            width: 45px;
+            flex-shrink: 0;
+        }
+
+        input, textarea {
+            flex-grow: 1;
+            min-width: 0;
+            background-color: #F9F9F9;
+            border: 2px solid #CCCCCC;
+            color: #1A1A1A;
+            padding: 10px;
+            font-size: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            height: 44px;
+            max-height: 44px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 80px;
+            max-height: 80px;
+            resize: none;
+        }
+
+        .btn-copiar, .btn-ojo, .btn-mostrar-grande {
+            background-color: #E0F2F1;
+            color: #004D40;
+            border: 2px solid #00796B;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+            height: 44px;
+        }
+
+        .btn-mostrar-grande {
+            background-color: #FFB300;
+            color: black;
+            border-color: #FF8F00;
+            width: 100%;
+            margin-top: 10px;
+            height: 50px;
+            font-size: 16px;
+        }
+
+        .btn-anadir {
+            background-color: #FFB300;
+            color: #000000;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 260px;
+            margin: 10px auto;
+            display: block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .texto-gigante {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00796B;
+            text-align: center;
+            margin-top: 5px;
+            background: #E0F2F1;
+            padding: 5px;
+            border-radius: 6px;
+        }
+
+        .foto-placeholder {
+            background-color: #E0E0E0;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #666;
+            font-weight: bold;
+            border: 2px dashed #999;
+            overflow: hidden;
+        }
+
+        /* ==========================================
+           4. MODALES Y SEGURIDAD (PIN)
+           ========================================== */
+        .pantalla-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .contenido-modal {
+            background-color: #FFFFFF;
+            width: 100%;
+            max-width: 340px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .grupo-formulario {
+            margin-bottom: 15px;
+        }
+
+        .grupo-formulario label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .bloque-botones-modal {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-modal.guardar { background-color: #00796B; color: white; }
+        .btn-modal.cancelar { background-color: #E0E0E0; color: #333; }
+        .btn-modal.peligro { background-color: #D32F2F; color: white; }
+
+        .opcion-ajuste {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* PANTALLA DE BLOQUEO */
+        #pantalla-bloqueo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #004D40;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        #inp-pin {
+            width: 200px !important;
+            max-width: 200px !important;
+            height: 48px !important;
+            max-height: 48px !important;
+            line-height: 48px !important;
+            font-size: 24px !important;
+            letter-spacing: 10px !important;
+            text-align: center !important;
+            margin: 20px auto !important;
+            color: #000000 !important;
+            background: #FFFFFF !important;
+            border: 2px solid #FFB300 !important;
+            border-radius: 8px !important;
+            box-sizing: border-box !important;
+            display: block !important;
+            flex: none !important;
+        }
+
+        /* ==========================================
+           5. ESCÁNER CON VISOR OSCURO
+           ========================================== */
+        .contenedor-escaner {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #video-camara {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* El visor oscuro: un overlay con un "hueco" en el medio */
+        .visor-oscuro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .visor-oscuro::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 10%;
+            width: 80%;
+            height: 55%;
+            /* Este box-shadow crea el efecto de "todo oscuro menos el centro" */
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+            border: 3px solid #FFB300;
+            border-radius: 8px;
+        }
+
+        .visor-oscuro::after {
+            content: '🪪 Apoye el carnet aquí';
+            position: absolute;
+            top: calc(15% + 8px);
+            left: calc(10% + 8px);
+            background: #FFB300;
+            color: black;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        /* ==========================================
+           6. LUPA DIGITAL
+           ========================================== */
+        .contenedor-lupa {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #video-lupa {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+
+        .controles-lupa {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .btn-lupa {
+            flex: 1;
+            background-color: #00796B;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn-lupa.activo {
+            background-color: #FFB300;
+            color: black;
+        }
+
+        .indicador-zoom {
+            text-align: center;
+            font-weight: bold;
+            color: #004D40;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        /* ==========================================
+           7. FICHA MÉDICA Y QR
+           ========================================== */
+        .tarjeta-ficha {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px;
+            border: 3px solid #D32F2F;
+            border-top: 8px solid #D32F2F;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            margin: 10px 0;
+        }
+
+        .header-ficha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #D32F2F;
+        }
+
+        .campo-ficha {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #EEE;
+        }
+
+        .campo-ficha:last-child {
+            border-bottom: none;
+        }
+
+        .label-ficha {
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .valor-ficha {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1A1A1A;
+        }
+
+        .contenedor-qr {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: #FFF8E1;
+            border-radius: 10px;
+            border: 2px dashed #FFB300;
+        }
+
+        #qrcode {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .texto-qr-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* ==========================================
+           8. PANTALLA "MOSTRAR EN GRANDE"
+           ========================================== */
+        #pantalla-mostrar-grande {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        #pantalla-mostrar-grande img {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+        }
+
+        #pantalla-mostrar-grande .texto-grande {
+            font-size: 48px;
+            font-weight: bold;
+            color: #004D40;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #pantalla-mostrar-grande .subtexto-grande {
+            font-size: 24px;
+            color: #555;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .instruccion-cerrar {
+            position: absolute;
+            bottom: 30px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* ==========================================
+           9. ZONA INFERIOR
+           ========================================== */
+        .zona-fija-inferior {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #FFFFFF;
+            border-top: 3px solid #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .pestanas-inferiores {
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+            padding: 8px 10px;
+        }
+
+        .btn-tab {
+            flex: 1;
+            background-color: #E0E0E0;
+            color: #555555;
+            border: none;
+            padding: 10px 2px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-tab.activo {
+            background-color: #00796B;
+            color: white;
+        }
+
+        .bloque-soporte {
+            background-color: #F1F8F6;
+            text-align: center;
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #004D40;
+            border-top: 1px solid #E0E0E0;
+            font-weight: bold;
+        }
+
+        .bloque-soporte a {
+            color: #0288D1;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-    <div id="toast-notification"></div>
-
-    <div id="modal-confirmacion" class="modal-overlay">
-        <div class="modal-box">
-            <p id="modal-mensaje"></p>
-            <div class="modal-botones">
-                <button class="btn-cancelar" onclick="cerrarModal(false)">Cancelar</button>
-                <button class="btn-confirmar" onclick="cerrarModal(true)">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pantalla-alarma">
-        <div class="alarma-icono" id="alarma-emoji">⏰</div>
-        <h2 id="alarma-titulo" style="font-size: 2rem; margin-bottom: 0.5rem;">Medicamento</h2>
-        <p id="alarma-detalle" style="font-size: 1.3rem; opacity: 0.9;"></p>
-        <div class="alarma-botones">
-            <button class="btn-alarma-tomar" onclick="alarmaConfirmar()">✅ Ya lo tomé / Listo</button>
-            <button class="btn-alarma-posponer" onclick="alarmaPosponer()">⏰ Posponer 5 min</button>
-        </div>
-    </div>
-
+    <!-- CABECERA -->
     <header>
-        <div class="logo-container">
-            <img src="./icon-192.png" alt="Logo" style="width: 28px; height: 28px; border-radius: 6px; object-fit: cover;">
-            <h1 style="font-size: 1.1rem;">Círculo Vital</h1>
-        </div>
-        <div class="nav-buttons">
-            <button class="btn-nav btn-install" id="btn-instalar-app" onclick="instalarPWA()">📲 Instalar</button>
-            <button class="btn-nav" style="font-size: 0.75rem;" onclick="abrirPantalla('pantalla-inicio')">Inicio</button>
-            <button class="btn-nav" style="font-size: 0.75rem;" onclick="abrirPantalla('pantalla-herramientas')">🛠️</button>
-            <button class="btn-nav" style="font-size: 0.75rem;" onclick="abrirPantalla('pantalla-ajustes')">Ajustes</button>
-        </div>
+        <button class="btn-cabecera-salir" onclick="bloquearApp()">Salir</button>
+        <div class="logo-boveda">Cartera Digital</div>
+        <button class="btn-cabecera-instalar oculto" id="btn-instalar-app" onclick="instalarApp()">Instalar</button>
+        <button class="btn-cabecera-ajustes" id="btn-abrir-ajustes">Ajustes</button>
     </header>
 
-    <div id="pantalla-inicio" style="display: block; width: 100%;">
-        <main>
-            <div class="med-warning-card" id="alerta-olvido">
-                <h3 style="color:var(--danger); font-size:1.05rem;">⚠️ Alerta de Salud Continua</h3>
-                <p style="font-size:0.9rem; color:#4b5563;">Dos o más medicamentos sin tomar.</p>
-                <a href="#" id="link-wa-olvido" class="btn-whatsapp" target="_blank" onclick="gestionarCierreAlertaAlEnviar()">Enviar Aviso a Familiar</a>
+    <main id="app-principal" class="pantalla-completa">
+        
+        <!-- SECCIÓN 1: CLAVES -->
+        <section id="vista-claves" class="vista-contenido">
+            <h2>Mis Claves</h2>
+            
+            <div class="contenedor-carrusel">
+                <button class="btn-flecha" onclick="cambiarTarjetaClaves(-1)">&lt;</button>
+                <div id="dinamico-claves" style="display: contents;"></div>
+                <button class="btn-flecha" onclick="cambiarTarjetaClaves(1)">&gt;</button>
             </div>
 
-            <div class="section-card" style="text-align:center; padding: 0.4rem;">
-                <button class="btn-sos" onclick="solicitarConfirmacionSOS()">SOS</button>
+            <button class="btn-anadir" onclick="abrirParaNueva('claves')">+ Añadir Nueva</button>
+        </section>
+
+        <!-- SECCIÓN 2: PAPELES -->
+        <section id="vista-papeles" class="vista-contenido oculto">
+            <h2>Mis Papeles</h2>
+            
+            <div class="contenedor-carrusel">
+                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(-1)">&lt;</button>
+                <div id="dinamico-papeles" style="display: contents;"></div>
+                <button class="btn-flecha" onclick="cambiarTarjetaPapeles(1)">&gt;</button>
             </div>
 
-            <div class="voice-btn-container">
-                <button class="btn-voice" id="btn-hablar" onclick="activarMicrofono()">🎙️ Hablar con la App</button>
+            <button class="btn-anadir" onclick="abrirParaNueva('papeles')">+ Añadir Papel</button>
+        </section>
+
+        <!-- SECCIÓN 3: ESCÁNER -->
+        <section id="vista-escaner" class="vista-contenido oculto">
+            <h2>Escanear Carnet</h2>
+            
+            <div class="contenedor-escaner">
+                <video id="video-camara" autoplay playsinline></video>
+                <div class="visor-oscuro"></div>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-modal guardar" onclick="tomarFoto()" style="flex:1; padding: 15px; font-size: 16px;">📸 Capturar Carnet</button>
             </div>
 
-            <div class="solapas-container">
-                <button class="btn-solapa active" id="tab-salud" onclick="cambiarSolapa('salud')">💊 Salud</button>
-                <button class="btn-solapa" id="tab-tareas" onclick="cambiarSolapa('tareas')">🗓️ Tareas</button>
-                <button class="btn-solapa" id="tab-bolsillo" onclick="cambiarSolapa('bolsillo')">💰 Monedero</button>
-            </div>
+            <canvas id="canvas-foto" style="display:none;"></canvas>
+            <div id="resultado-foto" style="margin-top:15px; text-align:center;"></div>
 
-            <div class="vista-solapa active" id="vista-salud">
-                <div class="section-card">
-                    <h2>Medicaciones de Hoy</h2>
-                    <div id="lista-salud"></div>
+            <div id="controles-foto" class="oculto" style="margin-top: 10px;">
+                <button class="btn-anadir" onclick="guardarFotoEnPapeles()" style="background:#388E3C; color:white;">✅ Guardar en Mis Papeles</button>
+                <button class="btn-anadir" onclick="compartirFoto()" style="background:#0288D1; color:white; margin-top: 5px;">📤 Compartir Foto</button>
+                <button class="btn-anadir" onclick="descartarFoto()" style="background:#757575; color:white; margin-top: 5px;">🔄 Volver a Sacar</button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: FICHA MÉDICA -->
+        <section id="vista-ficha" class="vista-contenido oculto">
+            <h2>Ficha de Emergencia</h2>
+            
+            <div class="tarjeta-ficha">
+                <div class="header-ficha">
+                    <span>🚨</span> Datos de Emergencia
                 </div>
-            </div>
 
-            <div class="vista-solapa" id="vista-tareas">
-                <div class="section-card">
-                    <h2>Actividades Planificadas</h2>
-                    <div id="lista-tareas"></div>
+                <div class="campo-ficha">
+                    <div class="label-ficha">Nombre Completo</div>
+                    <div class="valor-ficha" id="ficha-nombre">Sin cargar</div>
                 </div>
-            </div>
 
-            <div class="vista-solapa" id="vista-bolsillo">
-                <div class="section-card">
-                    <h2>Estado de mi Dinero</h2>
-                    <div class="wallet-display">
-                        <p id="txt-periodo-actual" style="font-size:0.9rem; color:#4b5563; font-weight:600;"></p>
-                        <div class="wallet-monto" id="wallet-restante">$0</div>
-                        <p style="font-size:0.85rem; color:#6b7280;">De un pozo de <span id="wallet-total">$0</span></p>
-                        <div class="progress-bar-container"><div class="progress-bar-fill" id="wallet-barra"></div></div>
+                <div class="campo-ficha">
+                    <div class="label-ficha">Tipo de Sangre</div>
+                    <div class="valor-ficha" id="ficha-sangre">Sin cargar</div>
+                </div>
+
+                <div class="campo-ficha">
+                    <div class="label-ficha">Alergias</div>
+                    <div class="valor-ficha" id="ficha-alergias">Sin cargar</div>
+                </div>
+
+                <div class="campo-ficha">
+                    <div class="label-ficha">Medicación Habitual</div>
+                    <div class="valor-ficha" id="ficha-medicacion">Sin cargar</div>
+                </div>
+
+                <div class="campo-ficha">
+                    <div class="label-ficha">Contacto de Emergencia</div>
+                    <div class="valor-ficha" id="ficha-contacto">Sin cargar</div>
+                </div>
+
+                <button class="btn-anadir" onclick="editarFichaMedica()" style="background:#2196F3; color:white; margin-top:10px;">✏️ Editar Ficha</button>
+
+                <div class="contenedor-qr">
+                    <strong style="color:#004D40; font-size:14px;">📱 Mostrá este código en una emergencia</strong>
+                    <div id="qrcode" style="margin-top:10px;"></div>
+                    <div class="texto-qr-info">
+                        El personal de salud puede escanearlo para ver tus datos
                     </div>
                 </div>
-                <div class="section-card">
-                    <h2>Gastos del Período</h2>
-                    <div id="lista-gastos"></div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: LUPA -->
+        <section id="vista-lupa" class="vista-contenido oculto">
+            <h2>Lupa Digital</h2>
+            
+            <div class="contenedor-lupa">
+                <video id="video-lupa" autoplay playsinline></video>
+            </div>
+
+            <div class="indicador-zoom">Zoom: <span id="nivel-zoom">2x</span></div>
+            
+            <div class="controles-lupa">
+                <button class="btn-lupa" onclick="cambiarZoom(-1)">🔍− Menos</button>
+                <button class="btn-lupa" id="btn-linterna" onclick="toggleLinterna()">💡 Luz</button>
+                <button class="btn-lupa" onclick="cambiarZoom(1)">🔍+ Más</button>
+            </div>
+
+            <p style="text-align:center; font-size:12px; color:#666; margin-top:10px;">
+                Acercá el celular al texto que quieras leer
+            </p>
+        </section>
+    </main>
+
+    <!-- MODAL: FORMULARIO CLAVES/PAPELES -->
+    <div id="modal-formulario" class="pantalla-modal oculto">
+        <div class="contenido-modal" style="border-top: 8px solid #FFB300;">
+            <h3 id="titulo-modal" style="margin-bottom: 15px; color: #004D40;">Añadir</h3>
+            
+            <input type="hidden" id="form-contexto">
+            <input type="hidden" id="form-indice-edicion">
+
+            <div class="grupo-formulario">
+                <label id="lbl-nombre">Nombre:</label>
+                <input type="text" id="inp-nombre" placeholder="Ej: PAMI, Farmacia">
+            </div>
+            <div class="grupo-formulario">
+                <label id="lbl-dato1">Dato principal:</label>
+                <input type="text" id="inp-dato1" placeholder="Usuario, número, etc.">
+            </div>
+            <div class="grupo-formulario">
+                <label id="lbl-dato2">Dato secundario:</label>
+                <input type="text" id="inp-dato2" placeholder="Clave, detalle, etc.">
+            </div>
+
+            <div class="grupo-formulario oculto" id="grupo-foto-adjunta">
+                <label>Adjuntar Foto / Imagen:</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <label for="inp-foto" style="flex:1; background:#00796B; color:white; padding:8px; text-align:center; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; margin-bottom:0;">
+                        Galería
+                    </label>
+                    <input type="file" id="inp-foto" accept="image/*" style="display:none;">
+                    <label for="inp-camara-directa" style="flex:1; background:#FFB300; color:black; padding:8px; text-align:center; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; margin-bottom:0;">
+                        Sacar Foto
+                    </label>
+                    <input type="file" id="inp-camara-directa" accept="image/*" capture="environment" style="display:none;">
                 </div>
+                <div id="preview-foto-modal" style="margin-top: 8px; text-align: center;"></div>
             </div>
-        </main>
-    </div>
 
-    <div id="pantalla-ajustes" class="overlay-screen">
-        <h2 style="margin-bottom: 1.5rem;">Configuración</h2>
-        <div class="section-card" style="box-shadow:none; padding:0; margin-bottom:1.5rem;">
-            <h3 style="font-size:1rem; margin-bottom:0.75rem; color:var(--primary);">Ajustes de Alertas</h3>
-            <div class="form-group">
-                <label>Sonido para Medicamentos</label>
-                <select id="sonido-salud">
-                    <option value="zen">🎵 Melodía Zen</option>
-                    <option value="aves">🐦 Pajaritos</option>
-                    <option value="digital">🔔 Timbre Digital</option>
-                    <option value="chicharra">🚨 Chicharra Suave</option>
-                </select>
+            <div class="bloque-botones-modal">
+                <button class="btn-modal cancelar" id="btn-cerrar-formulario">Cerrar</button>
+                <button class="btn-modal guardar" id="btn-guardar-formulario">Guardar</button>
             </div>
-            <div class="form-group">
-                <label>Sonido para Actividades</label>
-                <select id="sonido-tareas">
-                    <option value="zen">🎵 Melodía Zen</option>
-                    <option value="aves">🐦 Pajaritos</option>
-                    <option value="digital">🔔 Timbre Digital</option>
-                    <option value="chicharra">🚨 Chicharra Suave</option>
-                </select>
-            </div>
-            <button class="btn-submit" onclick="probarSonidoSeleccionado()">🎵 Probar Sonido</button>
-        </div>
-        <div class="section-card" style="box-shadow:none; padding:0; margin-bottom:1.5rem;">
-            <h3 style="font-size:1rem; margin-bottom:0.75rem; color:var(--primary);">Configuración de Monedero</h3>
-            <div class="form-group">
-                <label>Monto Límite ($)</label>
-                <input type="number" id="box-presupuesto-total" value="30000">
-            </div>
-            <div class="form-group">
-                <label>Ciclo</label>
-                <select id="box-presupuesto-ciclo">
-                    <option value="semanal">Semanal</option>
-                    <option value="quincenal">Quincenal</option>
-                </select>
-            </div>
-            <button class="btn-submit" style="background-color: var(--budget-color);" onclick="actualizarParametrosBolsillo()">Guardar</button>
-        </div>
-        <div class="section-card" style="box-shadow:none; padding:0;">
-            <h3 style="font-size:1rem; margin-bottom:0.75rem; color:var(--primary);">Agregar Manualmente</h3>
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="act-nombre">
-            </div>
-            <div class="form-group">
-                <label>Hora (HH:MM) o Monto ($)</label>
-                <input type="text" id="act-variable">
-            </div>
-            <div class="form-group">
-                <label>Tipo</label>
-                <select id="act-tipo">
-                    <option value="tarea">Actividad</option>
-                    <option value="med">Medicamento</option>
-                    <option value="bolsillo">Gasto</option>
-                </select>
-            </div>
-            <button class="btn-submit" onclick="guardarEntradaManual()">Agregar</button>
-            <div class="backup-container">
-                <h4>💾 Copia de Seguridad</h4>
-                <button type="button" class="btn-submit" style="background-color:#4b5563; margin:0.5rem 0;" onclick="exportarCopiaSeguridad()">Descargar</button>
-                <input type="file" id="file-backup" accept=".json" onchange="importarCopiaSeguridad(event)">
-            </div>
-            <button type="button" class="btn-submit" style="background-color:#6b7280; margin-top:1rem;" onclick="cerrarPantalla('pantalla-ajustes')">Volver</button>
         </div>
     </div>
 
-    <div id="pantalla-herramientas" class="overlay-screen">
-        <div style="display: grid; gap: 16px;">
-            <div class="section-card">
-                <h2>📝 Bloc de Notas</h2>
-                <textarea id="bloc-notas" style="width:100%; height:100px; padding:0.5rem; border:1px solid #d1d5db; border-radius:0.5rem;" placeholder="Escribí con el teclado o tocá Dictar..."></textarea>
-                <button class="btn-submit" style="background-color:#7c3aed; margin-top:0.5rem;" onclick="dictarAlBloc()">🎙️ Dictar nota</button>
-                <button class="btn-submit" style="background-color:#3b82f6; margin-top:0.5rem;" onclick="guardarNotaBloc()">💾 Guardar</button>
+    <!-- MODAL: FICHA MÉDICA -->
+    <div id="modal-ficha" class="pantalla-modal oculto">
+        <div class="contenido-modal" style="border-top: 8px solid #D32F2F;">
+            <h3 style="margin-bottom: 15px; color: #D32F2F;">🚨 Editar Ficha de Emergencia</h3>
+            
+            <div class="grupo-formulario">
+                <label>Nombre Completo:</label>
+                <input type="text" id="ficha-inp-nombre" placeholder="Ej: Juan Pérez">
             </div>
-            <div class="section-card">
-                <h2>🧮 Calculadora</h2>
-                <input type="text" id="calc-pantalla" readonly style="width:100%; height:40px; background:#f3f4f6; text-align:right; padding:8px; font-size:1.3rem; border-radius:8px; border:1px solid #d1d5db; margin-bottom:8px;">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
-                    <button class="btn-nav" style="height:38px; background:#ef4444;" onclick="limpiarCalc()">C</button>
-                    <button class="btn-nav" style="height:38px;" onclick="presionarCalc('/')">/</button>
-                    <button class="btn-nav" style="height:38px;" onclick="presionarCalc('*')">×</button>
-                    <button class="btn-nav" style="height:38px;" onclick="presionarCalc('-')">-</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('7')">7</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('8')">8</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('9')">9</button>
-                    <button class="btn-nav" style="height:38px;" onclick="presionarCalc('+')">+</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('4')">4</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('5')">5</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('6')">6</button>
-                    <button class="btn-nav" style="height:82px; background:#10b981; grid-row:span 2;" onclick="calcularResultado()">=</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('1')">1</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('2')">2</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('3')">3</button>
-                    <button class="btn-nav" style="height:38px; grid-column:span 2; background:#4b5563;" onclick="presionarCalc('0')">0</button>
-                    <button class="btn-nav" style="height:38px; background:#4b5563;" onclick="presionarCalc('.')">.</button>
+            <div class="grupo-formulario">
+                <label>Tipo de Sangre:</label>
+                <input type="text" id="ficha-inp-sangre" placeholder="Ej: O+ / A-">
+            </div>
+            <div class="grupo-formulario">
+                <label>Alergias:</label>
+                <textarea id="ficha-inp-alergias" placeholder="Ej: Penicilina, mariscos"></textarea>
+            </div>
+            <div class="grupo-formulario">
+                <label>Medicación Habitual:</label>
+                <textarea id="ficha-inp-medicacion" placeholder="Ej: Enalapril 5mg por la mañana"></textarea>
+            </div>
+            <div class="grupo-formulario">
+                <label>Contacto de Emergencia:</label>
+                <input type="text" id="ficha-inp-contacto" placeholder="Ej: María (hija) - 11-1234-5678">
+            </div>
+
+            <div class="bloque-botones-modal">
+                <button class="btn-modal cancelar" onclick="cerrarModalFicha()">Cancelar</button>
+                <button class="btn-modal guardar" onclick="guardarFichaMedica()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AJUSTES -->
+    <div id="modal-ajustes" class="pantalla-modal oculto">
+        <div class="contenido-modal" style="border-top: 8px solid #00796B;">
+            <h3 style="margin-bottom: 15px; color: #004D40;">Seguridad de la App</h3>
+            
+            <div class="opcion-ajuste"><input type="checkbox" checked disabled> Código PIN (siempre activo)</div>
+
+            <div class="bloque-botones-modal">
+                <button class="btn-modal cancelar" id="btn-cerrar-ajustes">Volver</button>
+                <button class="btn-modal peligro" onclick="olvidastePin()">Olvidé mi PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA MOSTRAR EN GRANDE -->
+    <div id="pantalla-mostrar-grande" class="oculto" onclick="cerrarMostrarGrande()">
+        <div id="contenido-mostrar-grande"></div>
+        <div class="instruccion-cerrar">Tocá en cualquier lado para volver</div>
+    </div>
+
+    <!-- ZONA INFERIOR -->
+    <div class="zona-fija-inferior">
+        <nav class="pestanas-inferiores">
+            <button id="tab-claves" class="btn-tab activo">🔑 Claves</button>
+            <button id="tab-papeles" class="btn-tab">📄 Papeles</button>
+            <button id="tab-escaner" class="btn-tab">📷 Escanear</button>
+            <button id="tab-ficha" class="btn-tab">🚨 Ficha</button>
+            <button id="tab-lupa" class="btn-tab">🔍 Lupa</button>
+        </nav>
+
+        <div class="bloque-soporte">
+            Sugerencias: <a href="mailto:iaparamayoresapp@gmail.com">iaparamayoresapp@gmail.com</a>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE BLOQUEO -->
+    <div id="pantalla-bloqueo">
+        <h2>Cartera Digital</h2>
+        <p style="margin-top:10px;">Ingrese su PIN para continuar</p>
+        <input type="password" id="inp-pin" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" autocomplete="off">
+        <button id="btn-entrar-pin" onclick="validarPin()" style="padding:15px 30px; font-size:18px; border-radius:10px; border:none; background:#FFB300; font-weight:bold; cursor:pointer; color:black; width:200px;">Entrar</button>
+
+        <div style="margin-top: 25px; display: flex; gap: 15px;">
+            <button type="button" onclick="cambiarPin()" style="background: transparent; border: none; color: #E0F2F1; text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
+                Cambiar PIN
+            </button>
+            <span style="color: #80CBC4;">|</span>
+            <button type="button" onclick="olvidastePin()" style="background: transparent; border: none; color: #FF8A80; text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
+                ¿Olvidaste tu clave?
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // MANEJO DE INSTALACIÓN PWA
+        // ==========================================
+        let diferidoPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            diferidoPrompt = e;
+            const btnInstalar = document.getElementById('btn-instalar-app');
+            if (btnInstalar) btnInstalar.classList.remove('oculto');
+        });
+
+        function instalarApp() {
+            if (diferidoPrompt) {
+                diferidoPrompt.prompt();
+                diferidoPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('btn-instalar-app').classList.add('oculto');
+                    }
+                    diferidoPrompt = null;
+                });
+            }
+        }
+
+        // ==========================================
+        // BASE DE DATOS LOCAL
+        // ==========================================
+        let datosApp = JSON.parse(localStorage.getItem('datos_cartera_v2')) || {
+            claves: [
+                { nombre: "Mi ANSES", icono: "🔑", tag1: "CUIL:", dato1: "20-12345678-9", tag2: "Clave:", dato2: "ClaveAnses2026" },
+                { nombre: "Mi PAMI", icono: "🔑", tag1: "User:", dato1: "afiliado_pami", tag2: "Clave:", dato2: "PamiClave987" }
+            ],
+            papeles: [
+                { nombre: "Carnet PAMI", icono: "🪪", tag1: "Nro Afiliado:", dato1: "1234567890", tag2: "Tipo:", dato2: "Salud", foto: "" }
+            ],
+            fichaMedica: {
+                nombre: "",
+                sangre: "",
+                alergias: "",
+                medicacion: "",
+                contacto: ""
+            }
+        };
+
+        let indiceClaves = 0;
+        let indicePapeles = 0;
+        let fotoCapturadaTemp = "";
+        let fotoTempModal = "";
+        let nivelZoomLupa = 2;
+        let linternaEncendida = false;
+        let streamLupaActual = null;
+
+        const modalFormulario = document.getElementById('modal-formulario');
+        const modalAjustes = document.getElementById('modal-ajustes');
+        const modalFicha = document.getElementById('modal-ficha');
+
+        // ==========================================
+        // SEGURIDAD PIN
+        // ==========================================
+        function validarPin() {
+            const pinIngresado = document.getElementById('inp-pin').value;
+            const pinGuardado = localStorage.getItem('mi_pin_cartera') || "1234";
+            let intentos = parseInt(sessionStorage.getItem('intentos_pin') || "0");
+
+            if (pinIngresado === pinGuardado) {
+                sessionStorage.removeItem('intentos_pin');
+                document.getElementById('pantalla-bloqueo').style.display = 'none';
+                document.getElementById('inp-pin').value = '';
+            } else {
+                intentos++;
+                sessionStorage.setItem('intentos_pin', intentos);
+                if (intentos >= 2) {
+                    alert('ACCESO BLOQUEADO. Cierre y vuelva a abrir la app para reintentar.');
+                    document.getElementById('inp-pin').disabled = true;
+                    document.getElementById('btn-entrar-pin').disabled = true;
+                    document.getElementById('btn-entrar-pin').style.backgroundColor = "#CCCCCC";
+                } else {
+                    alert('PIN incorrecto. Te queda 1 solo intento.');
+                    document.getElementById('inp-pin').value = '';
+                }
+            }
+        }
+
+        function bloquearApp() { 
+            document.getElementById('pantalla-bloqueo').style.display = 'flex'; 
+        }
+
+        function cambiarPin() {
+            const pinGuardado = localStorage.getItem('mi_pin_cartera') || "1234";
+            const pinActual = prompt("Ingrese su PIN actual:");
+            if (!pinActual) return;
+
+            if (pinActual === pinGuardado) {
+                const nuevoPin = prompt("Ingrese su nuevo PIN (4 números):");
+                if (nuevoPin && nuevoPin.length === 4 && !isNaN(nuevoPin)) {
+                    localStorage.setItem('mi_pin_cartera', nuevoPin);
+                    alert("PIN actualizado con éxito.");
+                    location.reload();
+                } else {
+                    alert("El nuevo PIN debe tener exactamente 4 números.");
+                }
+            } else {
+                alert("El PIN actual es incorrecto.");
+            }
+        }
+
+        function olvidastePin() {
+            const confirmacion = confirm(
+                "ATENCIÓN: Si restablece el PIN, volverá a ser '1234'.\n\n" +
+                "¿Desea continuar?"
+            );
+
+            if (confirmacion) {
+                localStorage.setItem('mi_pin_cartera', '1234');
+                sessionStorage.removeItem('intentos_pin');
+                alert("El PIN fue restablecido a '1234'.");
+                location.reload();
+            }
+        }
+
+        // ==========================================
+        // DIBUJAR TARJETAS
+        // ==========================================
+        function dibujarTarjetas() {
+            // CLAVES
+            const divClaves = document.getElementById('dinamico-claves');
+            if(divClaves) {
+                divClaves.innerHTML = '';
+                if(datosApp.claves.length === 0) {
+                    divClaves.innerHTML = `<div class="tarjeta-carrusel activa" style="text-align:center; padding:30px; font-weight:bold; color:#777;">No hay claves cargadas.</div>`;
+                } else {
+                    if (indiceClaves >= datosApp.claves.length) indiceClaves = 0;
+                    if (indiceClaves < 0) indiceClaves = datosApp.claves.length - 1;
+                    
+                    datosApp.claves.forEach((c, idx) => {
+                        const esActiva = (idx === indiceClaves) ? 'activa' : '';
+                        divClaves.innerHTML += `
+                            <div class="tarjeta-carrusel ${esActiva}">
+                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('claves', ${idx})">Editar</button>
+                                <div class="header-tarjeta"><span>${c.icono || '🔑'}</span> ${c.nombre}</div>
+                                <div class="campo-tarjeta">
+                                    <span class="etiqueta">${c.tag1 || 'User:'}</span>
+                                    <input type="text" value="${c.dato1}" readonly>
+                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato1.replace(/'/g, "\\'")}')">Copiar</button>
+                                </div>
+                                <div class="campo-tarjeta">
+                                    <span class="etiqueta">${c.tag2 || 'Clave:'}</span>
+                                    <input type="password" value="${c.dato2}" id="pass-dinamica-c-${idx}" readonly>
+                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')">Ver</button>
+                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato2.replace(/'/g, "\\'")}')">Copiar</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // PAPELES
+            const divPapeles = document.getElementById('dinamico-papeles');
+            if(divPapeles) {
+                divPapeles.innerHTML = '';
+                if(datosApp.papeles.length === 0) {
+                    divPapeles.innerHTML = `<div class="tarjeta-carrusel activa" style="text-align:center; padding:30px; font-weight:bold; color:#777;">No hay papeles cargados.</div>`;
+                } else {
+                    if (indicePapeles >= datosApp.papeles.length) indicePapeles = 0;
+                    if (indicePapeles < 0) indicePapeles = datosApp.papeles.length - 1;
+
+                    datosApp.papeles.forEach((p, idx) => {
+                        const esActiva = (idx === indicePapeles) ? 'activa' : '';
+                        const vistaFoto = p.foto 
+                            ? `<img src="${p.foto}" style="max-width:100%; max-height:160px; border-radius:6px;">` 
+                            : `<span style="font-size:13px;">[ Sin imagen ]</span>`;
+
+                        divPapeles.innerHTML += `
+                            <div class="tarjeta-carrusel ${esActiva}" style="border-top-color: #00E676; border-color: #00E676;">
+                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('papeles', ${idx})">Editar</button>
+                                <div class="header-tarjeta"><span>${p.icono || '📄'}</span> ${p.nombre}</div>
+                                <div class="foto-placeholder">${vistaFoto}</div>
+                                <div style="margin-top: 10px;">
+                                    <span class="etiqueta" style="width:100%;">${p.tag1 || 'Nro:'}</span>
+                                    <p class="texto-gigante">${p.dato1}</p>
+                                </div>
+                                <div style="margin-top: 5px; font-size:12px; color:#555; text-align:center; font-weight:bold;">
+                                    ${p.tag2 || 'Detalle:'} ${p.dato2}
+                                </div>
+                                <button class="btn-mostrar-grande" onclick='mostrarEnGrande(${JSON.stringify(p).replace(/'/g, "\\'")})'>
+                                    👁️ MOSTRAR EN GRANDE
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // FICHA MÉDICA
+            actualizarVistaFicha();
+        }
+
+        function cambiarTarjetaClaves(direccion) {
+            if(datosApp.claves.length <= 1) return;
+            indiceClaves += direccion;
+            dibujarTarjetas();
+        }
+
+        function cambiarTarjetaPapeles(direccion) {
+            if(datosApp.papeles.length <= 1) return;
+            indicePapeles += direccion;
+            dibujarTarjetas();
+        }
+
+        // ==========================================
+        // MOSTRAR EN GRANDE
+        // ==========================================
+        function mostrarEnGrande(papel) {
+            const pantalla = document.getElementById('pantalla-mostrar-grande');
+            const contenido = document.getElementById('contenido-mostrar-grande');
+            
+            let html = '';
+            if (papel.foto) {
+                html += `<img src="${papel.foto}" alt="${papel.nombre}">`;
+            }
+            html += `<div class="texto-grande">${papel.dato1}</div>`;
+            html += `<div class="subtexto-grande">${papel.nombre}</div>`;
+            
+            contenido.innerHTML = html;
+            pantalla.classList.remove('oculto');
+        }
+
+        function cerrarMostrarGrande() {
+            document.getElementById('pantalla-mostrar-grande').classList.add('oculto');
+        }
+
+        // ==========================================
+        // FICHA MÉDICA Y QR
+        // ==========================================
+        function actualizarVistaFicha() {
+            const f = datosApp.fichaMedica;
+            document.getElementById('ficha-nombre').innerText = f.nombre || 'Sin cargar';
+            document.getElementById('ficha-sangre').innerText = f.sangre || 'Sin cargar';
+            document.getElementById('ficha-alergias').innerText = f.alergias || 'Sin cargar';
+            document.getElementById('ficha-medicacion').innerText = f.medicacion || 'Sin cargar';
+            document.getElementById('ficha-contacto').innerText = f.contacto || 'Sin cargar';
+
+            // Generar QR
+            generarQR();
+        }
+
+        function generarQR() {
+            const f = datosApp.fichaMedica;
+            const contenedor = document.getElementById('qrcode');
+            contenedor.innerHTML = '';
+
+            // Si no hay datos, mostrar mensaje
+            if (!f.nombre && !f.sangre) {
+                contenedor.innerHTML = '<p style="color:#999; font-size:12px; padding:20px;">Complete la ficha para generar el QR</p>';
+                return;
+            }
+
+            // Armar texto con los datos
+            const textoQR = 
+`FICHA MÉDICA - CARTERA DIGITAL
+========================
+Nombre: ${f.nombre || '-'}
+Sangre: ${f.sangre || '-'}
+Alergias: ${f.alergias || '-'}
+Medicación: ${f.medicacion || '-'}
+Contacto: ${f.contacto || '-'}`;
+
+            new QRCode(contenedor, {
+                text: textoQR,
+                width: 180,
+                height: 180,
+                colorDark: "#004D40",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        function editarFichaMedica() {
+            const f = datosApp.fichaMedica;
+            document.getElementById('ficha-inp-nombre').value = f.nombre || '';
+            document.getElementById('ficha-inp-sangre').value = f.sangre || '';
+            document.getElementById('ficha-inp-alergias').value = f.alergias || '';
+            document.getElementById('ficha-inp-medicacion').value = f.medicacion || '';
+            document.getElementById('ficha-inp-contacto').value = f.contacto || '';
+            modalFicha.classList.remove('oculto');
+        }
+
+        function guardarFichaMedica() {
+            datosApp.fichaMedica = {
+                nombre: document.getElementById('ficha-inp-nombre').value.trim(),
+                sangre: document.getElementById('ficha-inp-sangre').value.trim(),
+                alergias: document.getElementById('ficha-inp-alergias').value.trim(),
+                medicacion: document.getElementById('ficha-inp-medicacion').value.trim(),
+                contacto: document.getElementById('ficha-inp-contacto').value.trim()
+            };
+            localStorage.setItem('datos_cartera_v2', JSON.stringify(datosApp));
+            modalFicha.classList.add('oculto');
+            actualizarVistaFicha();
+            alert('Ficha médica guardada con éxito.');
+        }
+
+        function cerrarModalFicha() {
+            modalFicha.classList.add('oculto');
+        }
+
+        // ==========================================
+        // ESCÁNER CON VISOR OSCURO
+        // ==========================================
+        const video = document.getElementById('video-camara');
+        
+        function iniciarCamaraEscaneer() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" },
+                    audio: false
+                })
+                    .then(stream => { video.srcObject = stream; })
+                    .catch(err => { 
+                        console.error("Error al acceder a la cámara: ", err);
+                        alert("No se pudo acceder a la cámara. Verifique los permisos.");
+                    });
+            }
+        }
+
+        function detenerCamara(videoElement) {
+            if (videoElement && videoElement.srcObject) {
+                videoElement.srcObject.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+        }
+
+        function tomarFoto() {
+            const canvas = document.getElementById('canvas-foto');
+            const context = canvas.getContext('2d');
+            
+            const anchoOriginal = video.videoWidth || 640;
+            const altoOriginal = video.videoHeight || 480;
+
+            // Calcular el recorte según el visor oscuro (10% margen X, 15% margen Y, 80% ancho, 55% alto)
+            const margenX = anchoOriginal * 0.10;
+            const margenY = altoOriginal * 0.15;
+            const anchoRecortado = anchoOriginal * 0.80;
+            const altoRecortado = altoOriginal * 0.55;
+
+            // Redimensionar a un tamaño manejable (máx 800px de ancho)
+            const MAX_ANCHO = 800;
+            let escala = MAX_ANCHO / anchoRecortado;
+            if (escala > 1) escala = 1;
+
+            canvas.width = anchoRecortado * escala;
+            canvas.height = altoRecortado * escala;
+
+            context.drawImage(
+                video, 
+                margenX, margenY, anchoRecortado, altoRecortado,
+                0, 0, canvas.width, canvas.height
+            );
+            
+            fotoCapturadaTemp = canvas.toDataURL('image/jpeg', 0.75);
+
+            document.getElementById('resultado-foto').innerHTML = `
+                <div style="text-align:center;">
+                    <img src="${fotoCapturadaTemp}" style="width:100%; border-radius:10px; border:2px solid #00796B;">
+                    <small style="color:#00796B; font-weight:bold; display:block; margin-top:5px;">✅ Carnet capturado</small>
                 </div>
-            </div>
-        </div>
-        <button type="button" class="btn-submit" style="background-color:#6b7280; margin-top:1rem;" onclick="cerrarPantalla('pantalla-herramientas')">Volver</button>
-    </div>
+            `;
+            document.getElementById('controles-foto').classList.remove('oculto');
+            
+            // Detener cámara para ahorrar batería
+            detenerCamara(video);
+        }
 
-    <div id="pantalla-ficha" class="overlay-screen">
-        <h2 style="margin-bottom: 1.5rem;">Ficha Médica</h2>
-        <form onsubmit="guardarDatosFicha(event)">
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="f-nombre" required>
-            </div>
-            <div class="form-group">
-                <label>Sangre</label>
-                <input type="text" id="f-sangre">
-            </div>
-            <div class="form-group">
-                <label>Patologías</label>
-                <input type="text" id="f-patologia">
-            </div>
-            <div class="form-group">
-                <label>Celular Familiar</label>
-                <input type="tel" id="c1-tel" required>
-            </div>
-            <div class="form-group">
-                <label>Celular Secundario</label>
-                <input type="tel" id="c2-tel">
-            </div>
-            <button type="submit" class="btn-submit">Guardar Ficha</button>
-            <button type="button" class="btn-submit" style="background:#6b7280; margin-top:0.5rem;" onclick="abrirPantalla('pantalla-ajustes')">Volver</button>
-        </form>
-    </div>
+        function guardarFotoEnPapeles() {
+            if(!fotoCapturadaTemp) return;
+            
+            datosApp.papeles.push({ 
+                nombre: "Carnet Escaneado", 
+                icono: "🪪", 
+                tag1: "Fecha:", 
+                dato1: new Date().toLocaleDateString(), 
+                tag2: "Tipo:", 
+                dato2: "Escaneado",
+                foto: fotoCapturadaTemp
+            });
+            
+            localStorage.setItem('datos_cartera_v2', JSON.stringify(datosApp));
+            alert("✅ Carnet guardado en Mis Papeles.");
+            
+            descartarFoto();
+            document.getElementById('tab-papeles').click();
+            indicePapeles = datosApp.papeles.length - 1;
+            dibujarTarjetas();
+        }
 
-    <footer>
-        <p>¿Dudas o sugerencias?</p>
-        <p><a href="mailto:iaparamayoresapp@gmail.com">iaparamayoresapp@gmail.com</a></p>
-    </footer>
+        function descartarFoto() {
+            fotoCapturadaTemp = "";
+            document.getElementById('resultado-foto').innerHTML = '';
+            document.getElementById('controles-foto').classList.add('oculto');
+            iniciarCamaraEscaneer();
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+        async function compartirFoto() {
+            if(!fotoCapturadaTemp) return;
+            
+            try {
+                const respuesta = await fetch(fotoCapturadaTemp);
+                const blob = await respuesta.blob();
+                const archivo = new File([blob], "carnet-escaneado.jpg", { type: "image/jpeg" });
 
-<script>
-const storageOK = (() => { try { const t='__t__'; localStorage.setItem(t,t); localStorage.removeItem(t); return true; } catch(e){return false;} })();
-function guardarD(k,v){ if(storageOK) try{localStorage.setItem(k,v);}catch(e){} }
-function obtenerD(k,d=null){ if(storageOK) try{return localStorage.getItem(k)||d;}catch(e){return d;} return d; }
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [archivo] })) {
+                    await navigator.share({
+                        title: 'Carnet de Cartera Digital',
+                        files: [archivo]
+                    });
+                } else {
+                    const enlace = document.createElement('a');
+                    enlace.href = fotoCapturadaTemp;
+                    enlace.download = 'carnet-escaneado.jpg';
+                    enlace.click();
+                    alert("La imagen se descargó. Podés compartirla desde tu galería.");
+                }
+            } catch (error) {
+                console.log("Usuario canceló o error:", error);
+            }
+        }
 
-if('serviceWorker' in navigator && location.protocol === 'https:'){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(r=>console.log('SW ok',r))
-      .catch(e=>console.log('SW error',e));
-  });
-}
+        // ==========================================
+        // LUPA DIGITAL
+        // ==========================================
+        const videoLupa = document.getElementById('video-lupa');
 
-function escapeHTML(s){ if(typeof s !== 'string') return s; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-let modalCB=null;
-function mostrarConfirmacion(msg,cb){ document.getElementById('modal-mensaje').textContent=msg; document.getElementById('modal-confirmacion').classList.add('show'); modalCB=cb; }
-function cerrarModal(ok){ document.getElementById('modal-confirmacion').classList.remove('show'); if(modalCB){modalCB(ok); modalCB=null;} }
+        async function iniciarLupa() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: "environment",
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false
+                    });
+                    videoLupa.srcObject = stream;
+                    streamLupaActual = stream;
+                    aplicarZoom();
+                } catch (err) {
+                    console.error("Error al acceder a la cámara: ", err);
+                    alert("No se pudo acceder a la cámara.");
+                }
+            }
+        }
 
-let registroTomas = {};
-let listaActividades = [];
-let datosFicha = {};
-let configSonidos = {salud:'zen', tareas:'aves'};
-let bolsilloPresupuesto = 30000;
-let bolsilloCiclo = 'semanal';
-let listaGastos = [];
-let fechaUltimoReset = new Date().toISOString();
-let alertaForzadaOcultaHoy = false;
-let deferredPrompt;
-let alertasEjecutadas = {};
-let medsOcultos = JSON.parse(obtenerD('circulo_meds_ocultos','[]'))||[];
+        function aplicarZoom() {
+            videoLupa.style.transform = `scale(${nivelZoomLupa})`;
+            document.getElementById('nivel-zoom').innerText = nivelZoomLupa + 'x';
+        }
 
-try {
-  registroTomas = JSON.parse(obtenerD('circulo_tomas','{}')) || {};
-  listaActividades = JSON.parse(obtenerD('circulo_actividades','[]')) || [];
-  datosFicha = JSON.parse(obtenerD('circulo_ficha','{}')) || {};
-  configSonidos = JSON.parse(obtenerD('circulo_sonidos','{"salud":"zen","tareas":"aves"}')) || {salud:'zen', tareas:'aves'};
-  bolsilloPresupuesto = parseFloat(obtenerD('bolsillo_total','30000')) || 30000;
-  bolsilloCiclo = obtenerD('bolsillo_ciclo','semanal') || 'semanal';
-  listaGastos = JSON.parse(obtenerD('bolsillo_gastos','[]')) || [];
-  fechaUltimoReset = obtenerD('bolsillo_reset_date', new Date().toISOString()) || new Date().toISOString();
-  alertasEjecutadas = JSON.parse(obtenerD('circulo_alertas_ejecutadas','{}')) || {};
-} catch(e){}
+        function cambiarZoom(direccion) {
+            nivelZoomLupa += direccion;
+            if (nivelZoomLupa < 1) nivelZoomLupa = 1;
+            if (nivelZoomLupa > 5) nivelZoomLupa = 5;
+            aplicarZoom();
+        }
 
-let idCounter = Date.now();
-function generarId(){ return ++idCounter; }
+        async function toggleLinterna() {
+            if (!streamLupaActual) return;
+            
+            const track = streamLupaActual.getVideoTracks()[0];
+            try {
+                const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+                if (capabilities.torch) {
+                    linternaEncendida = !linternaEncendida;
+                    await track.applyConstraints({ advanced: [{ torch: linternaEncendida }] });
+                    document.getElementById('btn-linterna').classList.toggle('activo', linternaEncendida);
+                } else {
+                    alert("Este dispositivo no tiene luz trasera disponible.");
+                }
+            } catch (err) {
+                console.error("Error con linterna:", err);
+                alert("No se pudo activar la luz.");
+            }
+        }
 
-const medicamentosBase = [
-  {id:1, nombre:"Enalapril 10mg", hora:"08:00", tipo:'med'},
-  {id:2, nombre:"Almuerzo y Vitamina D", hora:"13:00", tipo:'med'}
-];
+        // ==========================================
+        // FORMULARIOS CLAVES / PAPELES
+        // ==========================================
+        function leerImagenModal(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    fotoTempModal = evt.target.result;
+                    document.getElementById('preview-foto-modal').innerHTML = 
+                        `<img src="${fotoTempModal}" style="max-width:100%; max-height:120px; border-radius:6px; border:2px solid #00796B;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-function medsActivos(){ return medicamentosBase.filter(m=>!medsOcultos.includes(m.id)); }
-function borrarMedBase(id){
-  mostrarConfirmacion("¿Quitar este medicamento de la lista?", ok=>{
-    if(!ok) return;
-    medsOcultos.push(id);
-    guardarD('circulo_meds_ocultos', JSON.stringify(medsOcultos));
-    renderizar(); mostrarToast("Medicamento quitado");
-  });
-}
+        document.getElementById('inp-foto').addEventListener('change', function() { leerImagenModal(this); });
+        document.getElementById('inp-camara-directa').addEventListener('change', function() { leerImagenModal(this); });
 
-let audioCtx = null;
-function obtenerAudio(){
-  try {
-    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    if(audioCtx.state==='suspended') audioCtx.resume();
-    return audioCtx;
-  } catch(e){return null;}
-}
-document.addEventListener('click', obtenerAudio, {once:true});
-document.addEventListener('touchstart', obtenerAudio, {once:true});
+        function abrirParaNueva(contexto) {
+            document.getElementById('form-contexto').value = contexto;
+            document.getElementById('form-indice-edicion').value = "";
+            fotoTempModal = "";
+            document.getElementById('inp-foto').value = "";
+            document.getElementById('inp-camara-directa').value = "";
+            document.getElementById('preview-foto-modal').innerHTML = "";
+            
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "🔑 Añadir Credencial" : "📄 Añadir Papel";
+            document.getElementById('lbl-nombre').innerText = "Nombre:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número principal:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Detalle:";
 
-function sonidoZen(ctx){
-  if(!ctx) return;
-  [523.25,659.25,783.99,1046.50].forEach((f,i)=>{
-    const o=ctx.createOscillator(), g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type='sine'; o.frequency.value=f;
-    const t=ctx.currentTime+i*0.35;
-    g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(0.5,t+0.05);
-    g.gain.exponentialRampToValueAtTime(0.001,t+1.8);
-    o.start(t); o.stop(t+1.8);
-  });
-}
-function sonidoPajaros(ctx){
-  if(!ctx) return;
-  for(let i=0;i<5;i++){
-    const t=ctx.currentTime+i*0.25+Math.random()*0.1;
-    const o=ctx.createOscillator(), g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type='sine';
-    const b=2200+Math.random()*1200;
-    o.frequency.setValueAtTime(b,t);
-    o.frequency.linearRampToValueAtTime(b+800+Math.random()*600,t+0.08);
-    o.frequency.linearRampToValueAtTime(b+200,t+0.18);
-    g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(0.4,t+0.02);
-    g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
-    o.start(t); o.stop(t+0.25);
-  }
-}
-function sonidoDigital(ctx){
-  if(!ctx) return;
-  const t=ctx.currentTime;
-  const o1=ctx.createOscillator(), g1=ctx.createGain();
-  o1.connect(g1); g1.connect(ctx.destination);
-  o1.type='sine'; o1.frequency.value=880;
-  g1.gain.setValueAtTime(0.5,t);
-  g1.gain.exponentialRampToValueAtTime(0.001,t+0.6);
-  o1.start(t); o1.stop(t+0.6);
-  const o2=ctx.createOscillator(), g2=ctx.createGain();
-  o2.connect(g2); g2.connect(ctx.destination);
-  o2.type='sine'; o2.frequency.value=659.25;
-  g2.gain.setValueAtTime(0,t+0.35);
-  g2.gain.linearRampToValueAtTime(0.5,t+0.4);
-  g2.gain.exponentialRampToValueAtTime(0.001,t+1.0);
-  o2.start(t+0.35); o2.stop(t+1.0);
-}
-function sonidoChicharra(ctx){
-  if(!ctx) return;
-  const t=ctx.currentTime;
-  for(let i=0;i<3;i++){
-    const o=ctx.createOscillator(), g=ctx.createGain();
-    const lfo=ctx.createOscillator(), lfoG=ctx.createGain();
-    lfo.frequency.value=6; lfoG.gain.value=30;
-    lfo.connect(lfoG);
-    o.type='square'; o.frequency.value=440;
-    lfoG.connect(o.frequency);
-    o.connect(g); g.connect(ctx.destination);
-    g.gain.value=0.3;
-    const s=t+i*0.35;
-    o.start(s); lfo.start(s);
-    o.stop(s+0.25); lfo.stop(s+0.25);
-  }
-}
-function reproducirSonido(ctx,tipo){
-  if(!ctx) return;
-  switch(tipo){
-    case 'zen': sonidoZen(ctx); break;
-    case 'aves': sonidoPajaros(ctx); break;
-    case 'digital': sonidoDigital(ctx); break;
-    case 'chicharra': sonidoChicharra(ctx); break;
-    default: sonidoZen(ctx);
-  }
-}
-function probarSonidoSeleccionado(){ reproducirSonido(obtenerAudio(), document.getElementById('sonido-salud').value); }
+            document.getElementById('inp-nombre').value = "";
+            document.getElementById('inp-dato1').value = "";
+            document.getElementById('inp-dato2').value = "";
 
-let alarmaItem=null, bucleAlarm=null;
-function verificarAlarmas(){
-  const ahora=new Date();
-  const hoy=ahora.toISOString().split('T')[0];
-  const minAhora=ahora.getHours()*60+ahora.getMinutes();
-  [...medsActivos(),...listaActividades].forEach(item=>{
-    if(!item.hora||!item.hora.includes(':')) return;
-    const p=item.hora.split(':');
-    const h=parseInt(p[0]), m=parseInt(p[1]);
-    if(isNaN(h)||isNaN(m)) return;
-    const minAl=h*60+m, dif=minAl-minAhora;
-    if(dif>=0 && dif<=2){
-      const k=`${hoy}_${item.id}_${item.hora}`;
-      if(alertasEjecutadas[k]) return;
-      if(item.tipo==='med' && registroTomas[`${hoy}_${item.id}`]) return;
-      alertasEjecutadas[k]=true;
-      guardarD('circulo_alertas_ejecutadas', JSON.stringify(alertasEjecutadas));
-      dispararAlarma(item);
-    }
-  });
-}
-function dispararAlarma(item){
-  alarmaItem=item;
-  document.getElementById('alarma-emoji').textContent = item.tipo==='med'?'💊':'🗓️';
-  document.getElementById('alarma-titulo').textContent = item.tipo==='med'?'Hora del Medicamento':'Recordatorio';
-  document.getElementById('alarma-detalle').textContent = `${item.nombre} — ${item.hora}`;
-  document.getElementById('pantalla-alarma').classList.add('activa');
-  iniciarBucle(item.tipo==='med'?configSonidos.salud:configSonidos.tareas);
-  decir(`Recordatorio: ${item.nombre}`);
-}
-function iniciarBucle(tipo){
-  detenerBucle();
-  const ctx=obtenerAudio();
-  reproducirSonido(ctx,tipo);
-  if(navigator.vibrate) navigator.vibrate([800,300,800,300,800]);
-  bucleAlarm = setInterval(()=>{
-    reproducirSonido(ctx,tipo);
-    if(navigator.vibrate) navigator.vibrate([500,200,500]);
-  }, 6000);
-  setTimeout(()=>{detenerBucle(); cerrarPantallaAlarma();}, 90000);
-}
-function detenerBucle(){ if(bucleAlarm){clearInterval(bucleAlarm); bucleAlarm=null;} if(navigator.vibrate) navigator.vibrate(0); }
-function cerrarPantallaAlarma(){ document.getElementById('pantalla-alarma').classList.remove('activa'); alarmaItem=null; }
-function alarmaConfirmar(){
-  if(alarmaItem && alarmaItem.tipo==='med'){
-    const hoy=new Date().toISOString().split('T')[0];
-    registroTomas[`${hoy}_${alarmaItem.id}`]=true;
-    guardarD('circulo_tomas', JSON.stringify(registroTomas));
-  }
-  detenerBucle(); cerrarPantallaAlarma();
-  mostrarToast('¡Registrado!'); renderizar();
-}
-function alarmaPosponer(){
-  if(!alarmaItem) return;
-  const p=new Date(Date.now()+5*60000);
-  const nh=`${String(p.getHours()).padStart(2,'0')}:${String(p.getMinutes()).padStart(2,'0')}`;
-  listaActividades.push({id:generarId(), nombre:alarmaItem.nombre+' (pospuesta)', hora:nh, tipo:alarmaItem.tipo});
-  guardarD('circulo_actividades', JSON.stringify(listaActividades));
-  detenerBucle(); cerrarPantallaAlarma();
-  mostrarToast(`Pospuesta a las ${nh}`); renderizar();
-}
+            if(contexto === 'papeles') {
+                document.getElementById('grupo-foto-adjunta').classList.remove('oculto');
+            } else {
+                document.getElementById('grupo-foto-adjunta').classList.add('oculto');
+            }
 
-function abrirPantalla(id){
-  document.querySelectorAll('.overlay-screen').forEach(p=>p.classList.remove('activa'));
-  if(id==='pantalla-inicio') document.getElementById('pantalla-inicio').style.display='block';
-  else { document.getElementById('pantalla-inicio').style.display='none'; const p=document.getElementById(id); if(p) p.classList.add('activa'); }
-}
-function cerrarPantalla(id){ const p=document.getElementById(id); if(p) p.classList.remove('activa'); document.getElementById('pantalla-inicio').style.display='block'; }
+            modalFormulario.classList.remove('oculto');
+        }
 
-function cambiarSolapa(s){
-  ['tab-salud','tab-tareas','tab-bolsillo'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  ['vista-salud','vista-tareas','vista-bolsillo'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  if(s==='salud'){ document.getElementById('tab-salud').classList.add('active'); document.getElementById('vista-salud').classList.add('active'); }
-  else if(s==='tareas'){ document.getElementById('tab-tareas').classList.add('active'); document.getElementById('vista-tareas').classList.add('active'); }
-  else { document.getElementById('tab-bolsillo').classList.add('active'); document.getElementById('vista-bolsillo').classList.add('active'); }
-}
+        function abrirParaEditar(contexto, idx) {
+            document.getElementById('form-contexto').value = contexto;
+            document.getElementById('form-indice-edicion').value = idx;
+            document.getElementById('inp-foto').value = "";
+            document.getElementById('inp-camara-directa').value = "";
 
-window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; const b=document.getElementById('btn-instalar-app'); if(b) b.style.display='inline-block'; });
-function instalarPWA(){
-  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(r=>{ if(r.outcome==='accepted') mostrarToast('¡Instalada!'); deferredPrompt=null; const b=document.getElementById('btn-instalar-app'); if(b) b.style.display='none'; }); }
-}
+            const item = datosApp[contexto][idx];
+            
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "🔑 Editar Credencial" : "📄 Editar Papel";
+            document.getElementById('lbl-nombre').innerText = "Nombre:";
+            document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número principal:";
+            document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Detalle:";
 
-function decir(t){ try{ if('speechSynthesis' in window){ window.speechSynthesis.cancel(); const m=new SpeechSynthesisUtterance(t); m.lang='es-ES'; window.speechSynthesis.speak(m); } }catch(e){} }
-function mostrarToast(msg){ const t=document.getElementById('toast-notification'); if(t){ t.innerText=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);} }
+            document.getElementById('inp-nombre').value = item.nombre;
+            document.getElementById('inp-dato1').value = item.dato1;
+            document.getElementById('inp-dato2').value = item.dato2;
 
-function activarMicrofono(){
-  const btn=document.getElementById('btn-hablar');
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){ mostrarToast("Dictado no disponible"); return; }
-  const r=new SR(); r.lang='es-ES'; r.interimResults=false;
-  r.onstart=()=>{ btn.classList.add('listening'); btn.innerHTML="🛑 Escuchando..."; };
-  r.onerror=()=>{ btn.classList.remove('listening'); btn.innerHTML="🎙️ Hablar"; };
-  r.onend=()=>{ btn.classList.remove('listening'); btn.innerHTML="🎙️ Hablar con la App"; };
-  r.onresult=e=>procesarDictadoIntegral(e.results[0][0].transcript.toLowerCase());
-  r.start();
-}
-function procesarDictadoIntegral(f){
-  if(f.includes("gasté")||f.includes("gaste")||f.includes("pesos")||f.includes("plata")){
-    const n=f.match(/\d+/g); const m=n?parseFloat(n[0]):0;
-    let c=f.replace(/gasté|gaste|pesos|plata|en/g,"").replace(/\d+/g,"").trim();
-    if(c.length<2) c="Gasto dictado";
-    if(m>0){ listaGastos.push({id:generarId(), nombre:c.charAt(0).toUpperCase()+c.slice(1), monto:m}); guardarD('bolsillo_gastos',JSON.stringify(listaGastos)); renderizar(); cambiarSolapa('bolsillo'); mostrarToast(`$${m} registrado`); }
-    else mostrarToast("No entendí el monto");
-    return;
-  }
-  const hx=f.match(/(\d{1,2}):(\d{2})/);
-  let h=hx?`${hx[1].padStart(2,'0')}:${hx[2]}`:(()=>{const p=new Date(Date.now()+15*60000); return `${String(p.getHours()).padStart(2,'0')}:${String(p.getMinutes()).padStart(2,'0')}`;})();
-  let n=f.replace(/agendar|agregar|a las|las/g,"").replace(/\d{1,2}:\d{2}/,"").trim();
-  if(n.length<2) n="Actividad";
-  let tipo='tarea';
-  if(f.includes("pastilla")||f.includes("remedio")||f.includes("presión")||f.includes("médico")) tipo='med';
-  listaActividades.push({id:generarId(), nombre:n.charAt(0).toUpperCase()+n.slice(1), hora:h, tipo});
-  guardarD('circulo_actividades',JSON.stringify(listaActividades));
-  renderizar(); cambiarSolapa(tipo==='med'?'salud':'tareas');
-  mostrarToast(`Agendado a las ${h}`);
-}
+            if(contexto === 'papeles') {
+                document.getElementById('grupo-foto-adjunta').classList.remove('oculto');
+                fotoTempModal = item.foto || "";
+                if(fotoTempModal) {
+                    document.getElementById('preview-foto-modal').innerHTML = 
+                        `<img src="${fotoTempModal}" style="max-width:100%; max-height:120px; border-radius:6px; border:2px solid #00796B;">`;
+                } else {
+                    document.getElementById('preview-foto-modal').innerHTML = `<small style="color:#777;">Sin foto</small>`;
+                }
+            } else {
+                document.getElementById('grupo-foto-adjunta').classList.add('oculto');
+            }
 
-function calcularRestante(){ return bolsilloPresupuesto - listaGastos.reduce((s,g)=>s+g.monto,0); }
-function actualizarParametrosBolsillo(){
-  bolsilloPresupuesto=parseFloat(document.getElementById('box-presupuesto-total').value)||30000;
-  bolsilloCiclo=document.getElementById('box-presupuesto-ciclo').value;
-  guardarD('bolsillo_total', bolsilloPresupuesto.toString());
-  guardarD('bolsillo_ciclo', bolsilloCiclo);
-  renderizar(); mostrarToast("Monedero actualizado"); cerrarPantalla('pantalla-ajustes');
-}
-function verificarYDepurarBolsillo(){
-  try{
-    const a=new Date(), i=new Date(fechaUltimoReset);
-    const d=Math.floor((a-i)/(1000*60*60*24));
-    const l=bolsilloCiclo==='semanal'?7:15;
-    if(d>=l){ listaGastos=[]; fechaUltimoReset=a.toISOString(); guardarD('bolsillo_gastos',JSON.stringify(listaGastos)); guardarD('bolsillo_reset_date',fechaUltimoReset); mostrarToast("Ciclo limpio"); renderizar(); }
-  }catch(e){}
-}
+            modalFormulario.classList.remove('oculto');
+        }
 
-function guardarEntradaManual(){
-  const n=document.getElementById('act-nombre').value.trim();
-  const v=document.getElementById('act-variable').value.trim();
-  const t=document.getElementById('act-tipo').value;
-  if(!n||!v){ mostrarToast("Completa los datos"); return; }
-  if(t==='bolsillo'){ listaGastos.push({id:generarId(), nombre:n, monto:parseFloat(v)||0}); guardarD('bolsillo_gastos',JSON.stringify(listaGastos)); }
-  else { listaActividades.push({id:generarId(), nombre:n, hora:v, tipo:t}); guardarD('circulo_actividades',JSON.stringify(listaActividades)); }
-  configSonidos.salud=document.getElementById('sonido-salud').value;
-  configSonidos.tareas=document.getElementById('sonido-tareas').value;
-  guardarD('circulo_sonidos',JSON.stringify(configSonidos));
-  document.getElementById('act-nombre').value='';
-  document.getElementById('act-variable').value='';
-  renderizar(); mostrarToast("Guardado"); cerrarPantalla('pantalla-ajustes');
-  cambiarSolapa(t==='bolsillo'?'bolsillo':(t==='med'?'salud':'tareas'));
-}
-function borrarGasto(id){ mostrarConfirmacion("¿Borrar?", ok=>{ if(!ok) return; listaGastos=listaGastos.filter(g=>g.id!==id); guardarD('bolsillo_gastos',JSON.stringify(listaGastos)); renderizar(); mostrarToast("Eliminado"); }); }
-function borrarActividad(id){ mostrarConfirmacion("¿Borrar?", ok=>{ if(!ok) return; listaActividades=listaActividades.filter(a=>a.id!==id); guardarD('circulo_actividades',JSON.stringify(listaActividades)); renderizar(); mostrarToast("Eliminado"); }); }
-function marcarToma(id,nombre){ const h=new Date().toISOString().split('T')[0]; registroTomas[`${h}_${id}`]=true; guardarD('circulo_tomas',JSON.stringify(registroTomas)); mostrarToast(`Registrado: ${nombre}`); decir(`${nombre} completado`); renderizar(); }
+        document.getElementById('btn-guardar-formulario').addEventListener('click', () => {
+            const contexto = document.getElementById('form-contexto').value;
+            const indiceEdicion = document.getElementById('form-indice-edicion').value;
 
-function gestionarCierreAlertaAlEnviar(){ alertaForzadaOcultaHoy=true; document.getElementById('alerta-olvido').style.display='none'; mostrarToast("Enviado"); }
-function controlarOlvidosConsecutivos(){
-  if(alertaForzadaOcultaHoy){ document.getElementById('alerta-olvido').style.display='none'; return; }
-  const hoy=new Date().toISOString().split('T')[0];
-  const ahora=new Date();
-  const ha=`${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
-  const meds=[...medsActivos(),...listaActividades.filter(a=>a.tipo==='med')];
-  const pas=meds.filter(m=>m.hora<=ha);
-  let nt=0; pas.forEach(m=>{ if(!registroTomas[`${hoy}_${m.id}`]) nt++; });
-  const b=document.getElementById('alerta-olvido');
-  if(b){ if(nt>=2){ b.style.display='block'; if(datosFicha.familiar){ const m=encodeURIComponent(`Hola, Círculo Vital detectó olvidos de medicación.`); document.getElementById('link-wa-olvido').href=`https://wa.me/${datosFicha.familiar}?text=${m}`; } else document.getElementById('link-wa-olvido').href="#"; } else b.style.display='none'; }
-}
+            const nom = document.getElementById('inp-nombre').value.trim();
+            const d1 = document.getElementById('inp-dato1').value.trim();
+            const d2 = document.getElementById('inp-dato2').value.trim();
 
-function renderizar(){
-  const cS=document.getElementById('lista-salud'), cT=document.getElementById('lista-tareas'), cG=document.getElementById('lista-gastos');
-  if(!cS||!cT||!cG) return;
-  const hoy=new Date().toISOString().split('T')[0];
-  let hS='',hT='',hG='';
-  medsActivos().forEach(m=>{ if(!registroTomas[`${hoy}_${m.id}`]) hS+=`<div class="med-card"><div><strong>💊 ${escapeHTML(m.nombre)}</strong><br><small style="color:#6b7280;">${m.hora}</small></div><div style="display:flex; gap:6px; align-items:center;"><button class="btn-action" onclick="marcarToma(${m.id},'${escapeHTML(m.nombre)}')">Ya lo tomé</button><button class="btn-delete" onclick="borrarMedBase(${m.id})">✕</button></div></div>`; });
-  listaActividades.forEach(a=>{
-    if(a.tipo==='med'){ if(!registroTomas[`${hoy}_${a.id}`]) hS+=`<div class="med-card"><div><strong>💊 ${escapeHTML(a.nombre)}</strong><br><small style="color:#6b7280;">${escapeHTML(a.hora)}</small></div><div style="display:flex; gap:6px; align-items:center;"><button class="btn-action" onclick="marcarToma(${a.id},'${escapeHTML(a.nombre)}')">Ya lo tomé</button><button class="btn-delete" onclick="borrarActividad(${a.id})">✕</button></div></div>`; }
-    else if(a.tipo==='tarea') hT+=`<div class="agenda-card"><div><strong>🗓️ ${escapeHTML(a.nombre)}</strong><br><small style="color:#6b7280;">${escapeHTML(a.hora)}</small></div><button class="btn-delete" onclick="borrarActividad(${a.id})">✕</button></div>`;
-  });
-  listaGastos.forEach(g=>hG+=`<div class="expense-card"><div><strong>🛍️ ${escapeHTML(g.nombre)}</strong><br><small style="color:#dc2626; font-weight:bold;">-$${g.monto}</small></div><button class="btn-delete" onclick="borrarGasto(${g.id})">✕</button></div>`);
-  cS.innerHTML=hS; cT.innerHTML=hT; cG.innerHTML=hG;
-  const r=calcularRestante();
-  document.getElementById('wallet-restante').innerText=`$${r}`;
-  document.getElementById('wallet-total').innerText=`$${bolsilloPresupuesto}`;
-  document.getElementById('txt-periodo-actual').innerText=`Ciclo ${bolsilloCiclo.charAt(0).toUpperCase()+bolsilloCiclo.slice(1)}`;
-  let pct=(r/bolsilloPresupuesto)*100; if(pct<0)pct=0;
-  const b=document.getElementById('wallet-barra');
-  if(b){ b.style.width=`${pct}%`; b.style.backgroundColor=pct>50?'#10b981':(pct>15?'#f59e0b':'#dc2626'); }
-  if(cS.innerHTML==='') cS.innerHTML='<p style="color:#6b7280; text-align:center; padding:1rem;">Todo tomado.</p>';
-  if(cT.innerHTML==='') cT.innerHTML='<p style="color:#6b7280; text-align:center; padding:1rem;">Sin tareas.</p>';
-  if(cG.innerHTML==='') cG.innerHTML='<p style="color:#6b7280; text-align:center; padding:1rem;">Sin gastos.</p>';
-  controlarOlvidosConsecutivos();
-}
+            if(!nom || !d1) {
+                alert('Por favor complete los campos principales.');
+                return;
+            }
 
-function solicitarConfirmacionSOS(){ mostrarConfirmacion("¿Activar alerta SOS?", ok=>{ if(ok) ejecutarSOS(); }); }
-function ejecutarSOS(){
-  sonidoChicharra(obtenerAudio()); decir("SOS activado");
-  if(datosFicha.familiar){ const m=encodeURIComponent(`¡ALERTA SOS! Círculo Vital.`); window.open(`https://wa.me/${datosFicha.familiar}?text=${m}`,'_blank'); }
-  else { mostrarToast("Cargá un contacto en Ficha Médica"); abrirPantalla('pantalla-ficha'); }
-}
+            if(indiceEdicion === "") {
+                if(contexto === 'claves') {
+                    datosApp.claves.push({ nombre: nom, icono: "🔑", tag1: "User:", dato1: d1, tag2: "Clave:", dato2: d2 });
+                    indiceClaves = datosApp.claves.length - 1;
+                } else {
+                    datosApp.papeles.push({ nombre: nom, icono: "📄", tag1: "Nro:", dato1: d1, tag2: "Detalle:", dato2: d2, foto: fotoTempModal });
+                    indicePapeles = datosApp.papeles.length - 1;
+                }
+            } else {
+                const idx = parseInt(indiceEdicion);
+                datosApp[contexto][idx].nombre = nom;
+                datosApp[contexto][idx].dato1 = d1;
+                datosApp[contexto][idx].dato2 = d2;
+                if(contexto === 'papeles' && fotoTempModal) {
+                    datosApp[contexto][idx].foto = fotoTempModal;
+                }
+            }
 
-function exportarCopiaSeguridad(){
-  const d={circulo_tomas:obtenerD('circulo_tomas'), circulo_actividades:obtenerD('circulo_actividades'), circulo_ficha:obtenerD('circulo_ficha'), circulo_sonidos:obtenerD('circulo_sonidos'), bolsillo_total:obtenerD('bolsillo_total'), bolsillo_ciclo:obtenerD('bolsillo_ciclo'), bolsillo_gastos:obtenerD('bolsillo_gastos'), bolsillo_reset_date:obtenerD('bolsillo_reset_date'), circulo_nota_bloc:obtenerD('circulo_nota_bloc')};
-  const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));
-  const a=document.createElement('a'); a.setAttribute("href",s); a.setAttribute("download","backup_circulo_vital.json");
-  document.body.appendChild(a); a.click(); a.remove(); mostrarToast("Descargado");
-}
-function importarCopiaSeguridad(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); Object.keys(d).forEach(k=>{ if(d[k]!==null) guardarD(k,d[k]); }); location.reload(); }catch(err){ mostrarToast("Archivo inválido"); } }; r.readAsText(f); }
+            localStorage.setItem('datos_cartera_v2', JSON.stringify(datosApp));
+            dibujarTarjetas();
+            modalFormulario.classList.add('oculto');
+        });
 
-function guardarDatosFicha(e){
-  e.preventDefault();
-  datosFicha.nombre=document.getElementById('f-nombre').value;
-  datosFicha.sangre=document.getElementById('f-sangre').value;
-  datosFicha.patologia=document.getElementById('f-patologia').value;
-  datosFicha.familiar=document.getElementById('c1-tel').value;
-  datosFicha.secundario=document.getElementById('c2-tel').value;
-  guardarD('circulo_ficha',JSON.stringify(datosFicha));
-  mostrarToast("Ficha guardada"); cerrarPantalla('pantalla-ficha'); renderizar();
-}
+        document.getElementById('btn-cerrar-formulario').addEventListener('click', () => {
+            modalFormulario.classList.add('oculto');
+        });
 
-setInterval(()=>{ verificarAlarmas(); verificarYDepurarBolsillo(); const h=new Date().toISOString().split('T')[0]; Object.keys(alertasEjecutadas).forEach(k=>{ if(!k.startsWith(h+'_')) delete alertasEjecutadas[k]; }); }, 10000);
+        // ==========================================
+        // MODAL AJUSTES
+        // ==========================================
+        document.getElementById('btn-abrir-ajustes').addEventListener('click', () => { modalAjustes.classList.remove('oculto'); });
+        document.getElementById('btn-cerrar-ajustes').addEventListener('click', () => { modalAjustes.classList.add('oculto'); });
 
-document.addEventListener("DOMContentLoaded", ()=>{
-  renderizar();
-  const ss=document.getElementById('sonido-salud'), st=document.getElementById('sonido-tareas');
-  if(ss) ss.value=configSonidos.salud;
-  if(st) st.value=configSonidos.tareas;
-  const bp=document.getElementById('box-presupuesto-total'), bc=document.getElementById('box-presupuesto-ciclo');
-  if(bp) bp.value=bolsilloPresupuesto;
-  if(bc) bc.value=bolsilloCiclo;
-  if(datosFicha.nombre){ const e=document.getElementById('f-nombre'); if(e) e.value=datosFicha.nombre; }
-  if(datosFicha.sangre){ const e=document.getElementById('f-sangre'); if(e) e.value=datosFicha.sangre; }
-  if(datosFicha.patologia){ const e=document.getElementById('f-patologia'); if(e) e.value=datosFicha.patologia; }
-  if(datosFicha.familiar){ const e=document.getElementById('c1-tel'); if(e) e.value=datosFicha.familiar; }
-  if(datosFicha.secundario){ const e=document.getElementById('c2-tel'); if(e) e.value=datosFicha.secundario; }
-  const t=document.getElementById('bloc-notas'); if(t) t.value=obtenerD('circulo_nota_bloc','');
-  verificarYDepurarBolsillo();
-});
+        // ==========================================
+        // NAVEGACIÓN POR PESTAÑAS
+        // ==========================================
+        const vistas = {
+            'tab-claves': document.getElementById('vista-claves'),
+            'tab-papeles': document.getElementById('vista-papeles'),
+            'tab-escaner': document.getElementById('vista-escaner'),
+            'tab-ficha': document.getElementById('vista-ficha'),
+            'tab-lupa': document.getElementById('vista-lupa')
+        };
 
-function dictarAlBloc(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){ mostrarToast("Dictado no disponible"); return; }
-  const r=new SR(); r.lang='es-ES'; r.interimResults=false;
-  mostrarToast("🎙️ Escuchando nota...");
-  r.onresult=e=>{ const t=e.results[0][0].transcript; const ta=document.getElementById('bloc-notas'); ta.value=(ta.value? ta.value+' ':'')+t; mostrarToast("Dictado listo, tocá Guardar"); };
-  r.onerror=()=>mostrarToast("No escuché nada");
-  r.start();
-}
-function guardarNotaBloc(){ guardarD('circulo_nota_bloc', document.getElementById('bloc-notas').value); mostrarToast("Nota guardada"); }
-function presionarCalc(v){ const p=document.getElementById('calc-pantalla'); if(p) p.value+=v; }
-function limpiarCalc(){ const p=document.getElementById('calc-pantalla'); if(p) p.value=''; }
-function calcularResultado(){ try{ const p=document.getElementById('calc-pantalla'); if(!p) return; const i=p.value; if(!i) return; if(!/^[\d+\-*/.()\s]+$/.test(i)){p.value='Error';return;} p.value=new Function('return '+i)(); }catch(e){ const p=document.getElementById('calc-pantalla'); if(p) p.value='Error'; } }
-</script>
+        Object.keys(vistas).forEach(tabId => {
+            document.getElementById(tabId).addEventListener('click', () => {
+                // Detener cámaras anteriores
+                detenerCamara(video);
+                detenerCamara(videoLupa);
+                if (streamLupaActual) {
+                    streamLupaActual.getTracks().forEach(t => t.stop());
+                    streamLupaActual = null;
+                }
+                if (linternaEncendida) {
+                    linternaEncendida = false;
+                    document.getElementById('btn-linterna').classList.remove('activo');
+                }
+
+                document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('activo'));
+                Object.values(vistas).forEach(v => v.classList.add('oculto'));
+                
+                document.getElementById(tabId).classList.add('activo');
+                vistas[tabId].classList.remove('oculto');
+
+                // Iniciar cámara según la pestaña
+                if(tabId === 'tab-escaner') {
+                    iniciarCamaraEscaneer();
+                } else if (tabId === 'tab-lupa') {
+                    iniciarLupa();
+                }
+            });
+        });
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        function alternarClave(idInput) {
+            const input = document.getElementById(idInput);
+            input.type = (input.type === "password") ? "text" : "password";
+        }
+
+        function copiarTexto(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                alert('✅ Copiado con éxito.');
+            }).catch(err => { alert('Error: ' + err); });
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        dibujarTarjetas();
+
+        // Restaurar estado de bloqueo si estaba bloqueado
+        if (parseInt(sessionStorage.getItem('intentos_pin') || "0") >= 2) {
+            document.getElementById('inp-pin').disabled = true;
+            document.getElementById('btn-entrar-pin').disabled = true;
+            document.getElementById('btn-entrar-pin').style.backgroundColor = "#CCCCCC";
+        }
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('Service Worker OK'))
+                .catch((err) => console.log('Error SW: ', err));
+            });
+        }
+
+        // Enter en el PIN para validar
+        document.getElementById('inp-pin').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') validarPin();
+        });
+    </script>
 </body>
 </html>
