@@ -34,7 +34,7 @@
             display: flex;
             flex-direction: column;
             padding: 10px;
-            padding-bottom: 350px;
+            padding-bottom: 280px; /* Ajustado: menos espacio muerto */
             overflow-y: auto;
             height: calc(100vh - 120px);
         }
@@ -58,7 +58,7 @@
         }
 
         .logo-boveda {
-            font-size: 18px;
+            font-size: 22px; /* Aumentado para mejor lectura */
             font-weight: bold;
             color: #004D40;
             flex-grow: 1;
@@ -139,7 +139,7 @@
             flex: 1;
             background-color: #FFFFFF;
             border-radius: 16px;
-            padding: 20px;
+            padding: 60px 20px 20px 20px; /* 60px arriba para hacer lugar al botón Editar */
             border: 3px solid #00796B;
             border-top: 8px solid #00796B;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
@@ -183,11 +183,19 @@
             padding: 5px;
         }
 
+        /* NUEVO LAYOUT PARA INPUTS: Evita que se corten */
         .campo-tarjeta {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column; /* Etiqueta arriba, input+botón abajo */
+            align-items: flex-start;
+            gap: 5px;
             margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .fila-input {
+            display: flex;
+            gap: 8px;
             width: 100%;
         }
 
@@ -195,13 +203,12 @@
             font-size: 14px;
             font-weight: bold;
             color: #555555;
-            width: 50px;
-            flex-shrink: 0;
+            width: 100%; /* Ocupa todo el ancho arriba */
         }
 
         input, textarea {
             flex-grow: 1;
-            min-width: 0;
+            min-width: 0; /* Crucial para que no se desborde en flex */
             background-color: #F9F9F9;
             border: 2px solid #CCCCCC;
             color: #1A1A1A;
@@ -642,23 +649,26 @@
             z-index: 100;
         }
 
+        /* NAVEGACIÓN EN DOS FILAS */
         .pestanas-inferiores {
             display: flex;
+            flex-wrap: wrap; /* Permite saltar de línea */
             justify-content: space-between;
-            gap: 4px;
+            gap: 6px;
             padding: 8px 10px;
         }
 
         .btn-tab {
-            flex: 1;
+            flex: 1 1 30%; /* Ocupa aprox 1/3 del ancho */
             background-color: #E0E0E0;
             color: #555555;
             border: none;
-            padding: 10px 2px;
-            font-size: 11px;
+            padding: 12px 2px;
+            font-size: 12px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
+            text-align: center;
         }
 
         .btn-tab.activo {
@@ -717,13 +727,116 @@
             color: #0288D1;
             text-decoration: underline;
         }
+
+        /* ==========================================
+           10. GUÍA DE TRÁMITES
+           ========================================== */
+        .contenedor-tramites {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .tarjeta-tramite {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 6px solid #00796B;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .titulo-tramite {
+            font-size: 18px;
+            font-weight: bold;
+            color: #004D40;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-tramite {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #F9F9F9;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .item-tramite.completado {
+            background-color: #E0F2F1;
+            border-color: #00796B;
+        }
+
+        .item-tramite.completado .texto-tramite {
+            text-decoration: line-through;
+            color: #00796B;
+        }
+
+        .checkbox-grande {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #00796B;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            background-color: white;
+            flex-shrink: 0;
+        }
+
+        .item-tramite.completado .checkbox-grande {
+            background-color: #00796B;
+        }
+
+        .texto-tramite {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        .btn-ver-papel {
+            background-color: #FFB300;
+            color: black;
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .btn-reiniciar-tramites {
+            background-color: #D32F2F;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <!-- CABECERA -->
     <header>
-        <button class="btn-cabecera-salir" onclick="bloquearApp()">Salir</button>
+        <button class="btn-cabecera-salir" onclick="bloquearApp()">Bloquear</button>
         <div class="logo-boveda">Cartera Digital</div>
         <button class="btn-cabecera-instalar oculto" id="btn-instalar-app" onclick="instalarApp()">Instalar</button>
         <button class="btn-cabecera-ajustes" id="btn-abrir-ajustes">Ajustes</button>
@@ -757,7 +870,21 @@
             <button class="btn-anadir" onclick="abrirParaNueva('papeles')">+ Añadir Papel</button>
         </section>
 
-        <!-- SECCIÓN 3: ESCÁNER -->
+        <!-- SECCIÓN 3: TRÁMITES -->
+        <section id="vista-tramites" class="vista-contenido oculto">
+            <h2>Guía de Trámites</h2>
+            <p style="text-align:center; color:#666; font-size:14px; margin-bottom:15px;">
+                Marcá lo que ya pusiste en la carpeta antes de salir.
+            </p>
+            
+            <div id="contenedor-lista-tramites" class="contenedor-tramites">
+                <!-- Aquí se dibujan los trámites con JS -->
+            </div>
+
+            <button class="btn-reiniciar-tramites" onclick="reiniciarTramites()">🔄 Reiniciar todas las listas</button>
+        </section>
+
+        <!-- SECCIÓN 4: ESCÁNER -->
         <section id="vista-escaner" class="vista-contenido oculto">
             <h2>Escanear Carnet</h2>
             
@@ -780,7 +907,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 4: FICHA MÉDICA -->
+        <!-- SECCIÓN 5: FICHA MÉDICA -->
         <section id="vista-ficha" class="vista-contenido oculto">
             <h2>Ficha de Emergencia</h2>
             
@@ -826,7 +953,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 5: LUPA -->
+        <!-- SECCIÓN 6: LUPA -->
         <section id="vista-lupa" class="vista-contenido oculto">
             <h2>Lupa Digital</h2>
             
@@ -837,7 +964,7 @@
             <div class="indicador-zoom">Zoom: <span id="nivel-zoom">2x</span></div>
             
             <div class="controles-lupa">
-                <button class="btn-lupa" onclick="cambiarZoom(-1)">🔍− Menos</button>
+                <button class="btn-lupa" onclick="cambiarZoom(-1)">− Menos</button>
                 <button class="btn-lupa" id="btn-linterna" onclick="toggleLinterna()">💡 Luz</button>
                 <button class="btn-lupa" onclick="cambiarZoom(1)">🔍+ Más</button>
             </div>
@@ -949,9 +1076,11 @@
         <nav class="pestanas-inferiores">
             <button id="tab-claves" class="btn-tab activo">🔑 Claves</button>
             <button id="tab-papeles" class="btn-tab">📄 Papeles</button>
-            <button id="tab-escaner" class="btn-tab">📷 Escanear</button>
-            <button id="tab-ficha" class="btn-tab">🚨 Ficha</button>
+            <button id="tab-tramites" class="btn-tab"> Trámites</button>
+            
+            <button id="tab-ficha" class="btn-tab"> Ficha</button>
             <button id="tab-lupa" class="btn-tab">🔍 Lupa</button>
+            <button id="tab-escaner" class="btn-tab">📷 Escáner</button>
         </nav>
 
         <!-- SLIDES ROTATIVOS -->
@@ -964,7 +1093,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE BLOQUEO -->
+    <!-- PANTALLA DE BLOQUEO MEJORADA -->
     <div id="pantalla-bloqueo">
         <h2>Cartera Digital</h2>
         <p style="margin-top:10px;">Ingrese su PIN para continuar</p>
@@ -980,6 +1109,11 @@
                 ¿Olvidaste tu clave?
             </button>
         </div>
+        
+        <!-- Botón para intentar cerrar la app -->
+        <button onclick="cerrarAppCompletamente()" style="margin-top: 40px; background: #D32F2F; border: none; color: white; padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer;">
+            ❌ Cerrar Pestaña
+        </button>
     </div>
 
     <script>
@@ -1012,7 +1146,7 @@
         let datosApp = JSON.parse(localStorage.getItem('datos_cartera_v2')) || {
             claves: [
                 { nombre: "Mi ANSES", icono: "🔑", tag1: "CUIL:", dato1: "20-12345678-9", tag2: "Clave:", dato2: "ClaveAnses2026" },
-                { nombre: "Mi PAMI", icono: "🔑", tag1: "User:", dato1: "afiliado_pami", tag2: "Clave:", dato2: "PamiClave987" }
+                { nombre: "Mi PAMI", icono: "🔑", tag1: "Usuario:", dato1: "afiliado_pami", tag2: "Clave:", dato2: "PamiClave987" }
             ],
             papeles: [
                 { nombre: "Carnet PAMI", icono: "🪪", tag1: "Nro Afiliado:", dato1: "1234567890", tag2: "Tipo:", dato2: "Salud", foto: "" }
@@ -1039,7 +1173,7 @@
         const modalFicha = document.getElementById('modal-ficha');
 
         // ==========================================
-        // SEGURIDAD PIN
+        // SEGURIDAD PIN Y SALIR
         // ==========================================
         function validarPin() {
             const pinIngresado = document.getElementById('inp-pin').value;
@@ -1067,6 +1201,15 @@
 
         function bloquearApp() { 
             document.getElementById('pantalla-bloqueo').style.display = 'flex'; 
+        }
+
+        function cerrarAppCompletamente() {
+            // Intenta cerrar la ventana
+            window.close();
+            // Si no funciona (común en móviles), muestra instrucción
+            setTimeout(() => {
+                alert("Para salir completamente, desliza la pantalla hacia arriba o usá el botón de atrás de tu celular.");
+            }, 500);
         }
 
         function cambiarPin() {
@@ -1103,7 +1246,7 @@
         }
 
         // ==========================================
-        // DIBUJAR TARJETAS
+        // DIBUJAR TARJETAS (CON NUEVO LAYOUT DE INPUTS)
         // ==========================================
         function dibujarTarjetas() {
             // CLAVES
@@ -1122,16 +1265,24 @@
                             <div class="tarjeta-carrusel ${esActiva}">
                                 <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('claves', ${idx})"><span class="icono">✏️</span>Editar</button>
                                 <div class="header-tarjeta"><span>${c.icono || '🔑'}</span> ${c.nombre}</div>
+                                
+                                <!-- Campo 1: Layout vertical para evitar cortes -->
                                 <div class="campo-tarjeta">
-                                    <span class="etiqueta">${c.tag1 || 'User:'}</span>
-                                    <input type="text" value="${c.dato1}" readonly>
-                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato1.replace(/'/g, "\\'")}')"><span class="icono">📋</span>Copiar</button>
+                                    <span class="etiqueta">${c.tag1 || 'Usuario:'}</span>
+                                    <div class="fila-input">
+                                        <input type="text" value="${c.dato1}" readonly>
+                                        <button class="btn-copiar" onclick="copiarTexto('${c.dato1.replace(/'/g, "\\'")}')"><span class="icono">📋</span>Copiar</button>
+                                    </div>
                                 </div>
+
+                                <!-- Campo 2: Layout vertical -->
                                 <div class="campo-tarjeta">
                                     <span class="etiqueta">${c.tag2 || 'Clave:'}</span>
-                                    <input type="password" value="${c.dato2}" id="pass-dinamica-c-${idx}" readonly>
-                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')"><span class="icono">👁️</span>Ver</button>
-                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato2.replace(/'/g, "\\'")}')"><span class="icono">📋</span>Copiar</button>
+                                    <div class="fila-input">
+                                        <input type="password" value="${c.dato2}" id="pass-dinamica-c-${idx}" readonly>
+                                        <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')"><span class="icono">👁️</span>Ver</button>
+                                        <button class="btn-copiar" onclick="copiarTexto('${c.dato2.replace(/'/g, "\\'")}')"><span class="icono">📋</span>Copiar</button>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -1225,7 +1376,6 @@
             document.getElementById('ficha-medicacion').innerText = f.medicacion || 'Sin cargar';
             document.getElementById('ficha-contacto').innerText = f.contacto || 'Sin cargar';
 
-            // Generar QR
             generarQR();
         }
 
@@ -1234,13 +1384,11 @@
             const contenedor = document.getElementById('qrcode');
             contenedor.innerHTML = '';
 
-            // Si no hay datos, mostrar mensaje
             if (!f.nombre && !f.sangre) {
                 contenedor.innerHTML = '<p style="color:#999; font-size:12px; padding:20px;">Complete la ficha para generar el QR</p>';
                 return;
             }
 
-            // Armar texto con los datos
             const textoQR = 
 `FICHA MÉDICA - CARTERA DIGITAL
 ========================
@@ -1357,7 +1505,7 @@ Contacto: ${f.contacto || '-'}`;
             
             datosApp.papeles.push({ 
                 nombre: "Carnet Escaneado", 
-                icono: "🪪", 
+                icono: "", 
                 tag1: "Fecha:", 
                 dato1: new Date().toLocaleDateString(), 
                 tag2: "Tipo:", 
@@ -1490,7 +1638,7 @@ Contacto: ${f.contacto || '-'}`;
             document.getElementById('inp-camara-directa').value = "";
             document.getElementById('preview-foto-modal').innerHTML = "";
             
-            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "🔑 Añadir Credencial" : "📄 Añadir Papel";
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? " Añadir Credencial" : "📄 Añadir Papel";
             document.getElementById('lbl-nombre').innerText = "Nombre:";
             document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número principal:";
             document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Detalle:";
@@ -1516,7 +1664,7 @@ Contacto: ${f.contacto || '-'}`;
 
             const item = datosApp[contexto][idx];
             
-            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? "🔑 Editar Credencial" : "📄 Editar Papel";
+            document.getElementById('titulo-modal').innerText = contexto === 'claves' ? " Editar Credencial" : "📄 Editar Papel";
             document.getElementById('lbl-nombre').innerText = "Nombre:";
             document.getElementById('lbl-dato1').innerText = contexto === 'claves' ? "Usuario o CUIL:" : "Número principal:";
             document.getElementById('lbl-dato2').innerText = contexto === 'claves' ? "Contraseña:" : "Detalle:";
@@ -1556,7 +1704,7 @@ Contacto: ${f.contacto || '-'}`;
 
             if(indiceEdicion === "") {
                 if(contexto === 'claves') {
-                    datosApp.claves.push({ nombre: nom, icono: "🔑", tag1: "User:", dato1: d1, tag2: "Clave:", dato2: d2 });
+                    datosApp.claves.push({ nombre: nom, icono: "🔑", tag1: "Usuario:", dato1: d1, tag2: "Clave:", dato2: d2 });
                     indiceClaves = datosApp.claves.length - 1;
                 } else {
                     datosApp.papeles.push({ nombre: nom, icono: "", tag1: "Nro:", dato1: d1, tag2: "Detalle:", dato2: d2, foto: fotoTempModal });
@@ -1593,9 +1741,10 @@ Contacto: ${f.contacto || '-'}`;
         const vistas = {
             'tab-claves': document.getElementById('vista-claves'),
             'tab-papeles': document.getElementById('vista-papeles'),
-            'tab-escaner': document.getElementById('vista-escaner'),
+            'tab-tramites': document.getElementById('vista-tramites'),
             'tab-ficha': document.getElementById('vista-ficha'),
-            'tab-lupa': document.getElementById('vista-lupa')
+            'tab-lupa': document.getElementById('vista-lupa'),
+            'tab-escaner': document.getElementById('vista-escaner')
         };
 
         Object.keys(vistas).forEach(tabId => {
@@ -1652,7 +1801,7 @@ Contacto: ${f.contacto || '-'}`;
             { tipo: 'promo', texto: '💊 Organizador de Remedios - ¡No te olvides más tu medicación!', link: 'https://iaparamayores.github.io/organizador-remedios' },
             { tipo: 'frase', texto: ' "Cada día es una nueva oportunidad"' },
             { tipo: 'tip', texto: '🔍 Usá la Lupa Digital para leer textos pequeños' },
-            { tipo: 'promo', texto: '🤖 Aprendé IA paso a paso - Cursos gratuitos disponibles', link: 'https://iaparamayores.github.io/cursos-ia' }
+            { tipo: 'promo', texto: ' Aprendé IA paso a paso - Cursos gratuitos disponibles', link: 'https://iaparamayores.github.io/cursos-ia' }
         ];
 
         let indiceSlideActual = 0;
@@ -1674,14 +1823,103 @@ Contacto: ${f.contacto || '-'}`;
             indiceSlideActual = (indiceSlideActual + 1) % slides.length;
         }
 
-        // Iniciar rotación de slides (cada 5 segundos)
         mostrarSlide();
         setInterval(mostrarSlide, 5000);
+
+        // ==========================================
+        // GUÍA DE TRÁMITES
+        // ==========================================
+        const datosTramites = [
+            {
+                id: 'pami',
+                titulo: ' Renovar Receta / Turno PAMI',
+                pasos: [
+                    { texto: 'DNI original y una copia', vinculo: 'papeles' },
+                    { texto: 'Carnet de PAMI / Obra Social', vinculo: 'papeles' },
+                    { texto: 'Receta vieja o Orden médica', vinculo: 'papeles' }
+                ]
+            },
+            {
+                id: 'banco',
+                titulo: '🏦 Cobrar Jubilación / Ir al Banco',
+                pasos: [
+                    { texto: 'DNI original', vinculo: 'papeles' },
+                    { texto: 'Tarjeta de débito / Caja de ahorro', vinculo: 'papeles' },
+                    { texto: 'Clave de la tarjeta (de memoria)', vinculo: 'claves' }
+                ]
+            },
+            {
+                id: 'medico',
+                titulo: '🩺 Guardia Médica o Consultorio',
+                pasos: [
+                    { texto: 'DNI original', vinculo: 'papeles' },
+                    { texto: 'Carnet de la Obra Social', vinculo: 'papeles' },
+                    { texto: 'Orden médica o recetas actuales', vinculo: 'papeles' },
+                    { texto: 'Ver mi Ficha Médica (Alergias/Medicación)', vinculo: 'ficha' }
+                ]
+            }
+        ];
+
+        let estadoTramites = JSON.parse(localStorage.getItem('estado_tramites')) || {};
+
+        function dibujarTramites() {
+            const contenedor = document.getElementById('contenedor-lista-tramites');
+            contenedor.innerHTML = '';
+
+            datosTramites.forEach(tramite => {
+                let htmlPasos = '';
+                tramite.pasos.forEach((paso, index) => {
+                    const pasoId = `${tramite.id}_${index}`;
+                    const estaCompleto = estadoTramites[pasoId] ? 'completado' : '';
+                    const checkIcon = estadoTramites[pasoId] ? '✅' : '';
+                    
+                    let botonVinculo = '';
+                    if (paso.vinculo) {
+                        const textoVinculo = paso.vinculo === 'ficha' ? 'Ver Ficha Médica' : 'Ver en Mis Papeles/Claves';
+                        botonVinculo = `<button class="btn-ver-papel" onclick="irAPestana('${paso.vinculo}')">👉 ${textoVinculo}</button>`;
+                    }
+
+                    htmlPasos += `
+                        <div class="item-tramite ${estaCompleto}" onclick="togglePaso('${pasoId}')">
+                            <div class="checkbox-grande">${checkIcon}</div>
+                            <div class="texto-tramite">${paso.texto}</div>
+                        </div>
+                        ${botonVinculo}
+                    `;
+                });
+
+                contenedor.innerHTML += `
+                    <div class="tarjeta-tramite">
+                        <div class="titulo-tramite">${tramite.titulo}</div>
+                        ${htmlPasos}
+                    </div>
+                `;
+            });
+        }
+
+        function togglePaso(pasoId) {
+            estadoTramites[pasoId] = !estadoTramites[pasoId];
+            localStorage.setItem('estado_tramites', JSON.stringify(estadoTramites));
+            dibujarTramites();
+        }
+
+        function reiniciarTramites() {
+            if(confirm('¿Querés desmarcar todas las listas para la próxima vez que salgas?')) {
+                estadoTramites = {};
+                localStorage.setItem('estado_tramites', JSON.stringify(estadoTramites));
+                dibujarTramites();
+            }
+        }
+
+        function irAPestana(tabName) {
+            document.getElementById(`tab-${tabName}`).click();
+        }
 
         // ==========================================
         // INICIALIZACIÓN
         // ==========================================
         dibujarTarjetas();
+        dibujarTramites(); // Inicializar trámites
 
         if (parseInt(sessionStorage.getItem('intentos_pin') || "0") >= 2) {
             document.getElementById('inp-pin').disabled = true;
