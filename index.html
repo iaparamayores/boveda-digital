@@ -34,7 +34,7 @@
             display: flex;
             flex-direction: column;
             padding: 10px;
-            padding-bottom: 250px;
+            padding-bottom: 350px;
             overflow-y: auto;
             height: calc(100vh - 120px);
         }
@@ -139,7 +139,7 @@
             flex: 1;
             background-color: #FFFFFF;
             border-radius: 16px;
-            padding: 15px;
+            padding: 20px;
             border: 3px solid #00796B;
             border-top: 8px solid #00796B;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
@@ -156,39 +156,46 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
-            font-size: 18px;
+            margin-bottom: 15px;
+            font-size: 20px;
             font-weight: bold;
-            padding-right: 65px;
+            padding-right: 85px;
         }
 
         .btn-editar-tarjeta-texto {
             position: absolute;
-            top: 10px;
+            top: 15px;
             right: 15px;
             background-color: #2196F3;
             color: white;
             border: none;
-            padding: 5px 10px;
-            font-size: 12px;
+            width: 70px;
+            height: 70px;
+            font-size: 11px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 5px;
         }
 
         .campo-tarjeta {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 15px;
             width: 100%;
         }
 
         .etiqueta {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             color: #555555;
-            width: 45px;
+            width: 50px;
             flex-shrink: 0;
         }
 
@@ -199,11 +206,11 @@
             border: 2px solid #CCCCCC;
             color: #1A1A1A;
             padding: 10px;
-            font-size: 15px;
+            font-size: 16px;
             border-radius: 8px;
             font-weight: bold;
-            height: 44px;
-            max-height: 44px;
+            height: 50px;
+            max-height: 50px;
             box-sizing: border-box;
         }
 
@@ -213,40 +220,54 @@
             resize: none;
         }
 
-        .btn-copiar, .btn-ojo, .btn-mostrar-grande {
+        .btn-copiar, .btn-ojo {
+            width: 70px;
+            height: 70px;
             background-color: #E0F2F1;
             color: #004D40;
             border: 2px solid #00796B;
-            padding: 10px;
-            font-size: 14px;
+            font-size: 11px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             flex-shrink: 0;
-            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 5px;
+        }
+
+        .btn-copiar .icono, .btn-ojo .icono {
+            font-size: 24px;
+            margin-bottom: 2px;
         }
 
         .btn-mostrar-grande {
             background-color: #FFB300;
             color: black;
-            border-color: #FF8F00;
+            border: none;
             width: 100%;
-            margin-top: 10px;
-            height: 50px;
-            font-size: 16px;
+            margin-top: 15px;
+            height: 55px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
         }
 
         .btn-anadir {
             background-color: #FFB300;
             color: #000000;
             border: none;
-            padding: 14px;
-            font-size: 16px;
+            padding: 18px;
+            font-size: 18px;
             font-weight: bold;
             border-radius: 12px;
             width: 100%;
-            max-width: 260px;
-            margin: 10px auto;
+            max-width: 300px;
+            margin: 20px auto;
             display: block;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             cursor: pointer;
@@ -259,7 +280,7 @@
             text-align: center;
             margin-top: 5px;
             background: #E0F2F1;
-            padding: 5px;
+            padding: 8px;
             border-radius: 6px;
         }
 
@@ -403,7 +424,6 @@
             object-fit: cover;
         }
 
-        /* El visor oscuro: un overlay con un "hueco" en el medio */
         .visor-oscuro {
             position: absolute;
             top: 0;
@@ -420,14 +440,13 @@
             left: 10%;
             width: 80%;
             height: 55%;
-            /* Este box-shadow crea el efecto de "todo oscuro menos el centro" */
             box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
             border: 3px solid #FFB300;
             border-radius: 8px;
         }
 
         .visor-oscuro::after {
-            content: '🪪 Apoye el carnet aquí';
+            content: ' Apoye el carnet aquí';
             position: absolute;
             top: calc(15% + 8px);
             left: calc(10% + 8px);
@@ -609,7 +628,7 @@
         }
 
         /* ==========================================
-           9. ZONA INFERIOR
+           9. ZONA INFERIOR Y SLIDES
            ========================================== */
         .zona-fija-inferior {
             position: fixed;
@@ -645,6 +664,43 @@
         .btn-tab.activo {
             background-color: #00796B;
             color: white;
+        }
+
+        /* SLIDES ROTATIVOS */
+        .contenedor-slides {
+            background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%);
+            padding: 8px 15px;
+            text-align: center;
+            border-top: 1px solid #80CBC4;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .slide-item {
+            font-size: 14px;
+            color: #004D40;
+            font-weight: 500;
+            line-height: 1.4;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide-item a {
+            color: #00796B;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .slide-item .emoji {
+            font-size: 18px;
+            margin-right: 5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .bloque-soporte {
@@ -888,7 +944,7 @@
         <div class="instruccion-cerrar">Tocá en cualquier lado para volver</div>
     </div>
 
-    <!-- ZONA INFERIOR -->
+    <!-- ZONA INFERIOR CON SLIDES -->
     <div class="zona-fija-inferior">
         <nav class="pestanas-inferiores">
             <button id="tab-claves" class="btn-tab activo">🔑 Claves</button>
@@ -897,6 +953,11 @@
             <button id="tab-ficha" class="btn-tab">🚨 Ficha</button>
             <button id="tab-lupa" class="btn-tab">🔍 Lupa</button>
         </nav>
+
+        <!-- SLIDES ROTATIVOS -->
+        <div class="contenedor-slides">
+            <div id="slide-actual" class="slide-item"></div>
+        </div>
 
         <div class="bloque-soporte">
             Sugerencias: <a href="mailto:iaparamayoresapp@gmail.com">iaparamayoresapp@gmail.com</a>
@@ -1059,18 +1120,18 @@
                         const esActiva = (idx === indiceClaves) ? 'activa' : '';
                         divClaves.innerHTML += `
                             <div class="tarjeta-carrusel ${esActiva}">
-                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('claves', ${idx})">Editar</button>
+                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('claves', ${idx})"><span class="icono">✏️</span>Editar</button>
                                 <div class="header-tarjeta"><span>${c.icono || '🔑'}</span> ${c.nombre}</div>
                                 <div class="campo-tarjeta">
                                     <span class="etiqueta">${c.tag1 || 'User:'}</span>
                                     <input type="text" value="${c.dato1}" readonly>
-                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato1.replace(/'/g, "\\'")}')">Copiar</button>
+                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato1.replace(/'/g, "\\'")}')"><span class="icono">📋</span>Copiar</button>
                                 </div>
                                 <div class="campo-tarjeta">
                                     <span class="etiqueta">${c.tag2 || 'Clave:'}</span>
                                     <input type="password" value="${c.dato2}" id="pass-dinamica-c-${idx}" readonly>
-                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')">Ver</button>
-                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato2.replace(/'/g, "\\'")}')">Copiar</button>
+                                    <button class="btn-ojo" onclick="alternarClave('pass-dinamica-c-${idx}')"><span class="icono">👁️</span>Ver</button>
+                                    <button class="btn-copiar" onclick="copiarTexto('${c.dato2.replace(/'/g, "\\'")}')"><span class="icono">📋</span>Copiar</button>
                                 </div>
                             </div>
                         `;
@@ -1096,7 +1157,7 @@
 
                         divPapeles.innerHTML += `
                             <div class="tarjeta-carrusel ${esActiva}" style="border-top-color: #00E676; border-color: #00E676;">
-                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('papeles', ${idx})">Editar</button>
+                                <button class="btn-editar-tarjeta-texto" onclick="abrirParaEditar('papeles', ${idx})"><span class="icono">✏️</span>Editar</button>
                                 <div class="header-tarjeta"><span>${p.icono || '📄'}</span> ${p.nombre}</div>
                                 <div class="foto-placeholder">${vistaFoto}</div>
                                 <div style="margin-top: 10px;">
@@ -1260,13 +1321,11 @@ Contacto: ${f.contacto || '-'}`;
             const anchoOriginal = video.videoWidth || 640;
             const altoOriginal = video.videoHeight || 480;
 
-            // Calcular el recorte según el visor oscuro (10% margen X, 15% margen Y, 80% ancho, 55% alto)
             const margenX = anchoOriginal * 0.10;
             const margenY = altoOriginal * 0.15;
             const anchoRecortado = anchoOriginal * 0.80;
             const altoRecortado = altoOriginal * 0.55;
 
-            // Redimensionar a un tamaño manejable (máx 800px de ancho)
             const MAX_ANCHO = 800;
             let escala = MAX_ANCHO / anchoRecortado;
             if (escala > 1) escala = 1;
@@ -1290,7 +1349,6 @@ Contacto: ${f.contacto || '-'}`;
             `;
             document.getElementById('controles-foto').classList.remove('oculto');
             
-            // Detener cámara para ahorrar batería
             detenerCamara(video);
         }
 
@@ -1501,7 +1559,7 @@ Contacto: ${f.contacto || '-'}`;
                     datosApp.claves.push({ nombre: nom, icono: "🔑", tag1: "User:", dato1: d1, tag2: "Clave:", dato2: d2 });
                     indiceClaves = datosApp.claves.length - 1;
                 } else {
-                    datosApp.papeles.push({ nombre: nom, icono: "📄", tag1: "Nro:", dato1: d1, tag2: "Detalle:", dato2: d2, foto: fotoTempModal });
+                    datosApp.papeles.push({ nombre: nom, icono: "", tag1: "Nro:", dato1: d1, tag2: "Detalle:", dato2: d2, foto: fotoTempModal });
                     indicePapeles = datosApp.papeles.length - 1;
                 }
             } else {
@@ -1542,7 +1600,6 @@ Contacto: ${f.contacto || '-'}`;
 
         Object.keys(vistas).forEach(tabId => {
             document.getElementById(tabId).addEventListener('click', () => {
-                // Detener cámaras anteriores
                 detenerCamara(video);
                 detenerCamara(videoLupa);
                 if (streamLupaActual) {
@@ -1560,7 +1617,6 @@ Contacto: ${f.contacto || '-'}`;
                 document.getElementById(tabId).classList.add('activo');
                 vistas[tabId].classList.remove('oculto');
 
-                // Iniciar cámara según la pestaña
                 if(tabId === 'tab-escaner') {
                     iniciarCamaraEscaneer();
                 } else if (tabId === 'tab-lupa') {
@@ -1584,18 +1640,55 @@ Contacto: ${f.contacto || '-'}`;
         }
 
         // ==========================================
+        // SLIDES ROTATIVOS
+        // ==========================================
+        const slides = [
+            { tipo: 'promo', texto: '💊 ¿Usás el Organizador de Remedios? Disponible en iaparamayores.app', link: 'https://iaparamayores.github.io/organizador-remedios' },
+            { tipo: 'promo', texto: '🤖 Cursos de IA para adultos mayores - ¡Inscribite gratis!', link: 'https://iaparamayores.github.io/cursos-ia' },
+            { tipo: 'frase', texto: '✨ "Nunca es tarde para aprender algo nuevo"' },
+            { tipo: 'tip', texto: '💡 Tip: Tocá "Ver" para mostrar tu contraseña temporalmente' },
+            { tipo: 'frase', texto: '🌟 "La tecnología es tu aliada, no tu enemiga"' },
+            { tipo: 'tip', texto: '📱 Tip: Instalá la app en tu celular para acceder más rápido' },
+            { tipo: 'promo', texto: '💊 Organizador de Remedios - ¡No te olvides más tu medicación!', link: 'https://iaparamayores.github.io/organizador-remedios' },
+            { tipo: 'frase', texto: ' "Cada día es una nueva oportunidad"' },
+            { tipo: 'tip', texto: '🔍 Usá la Lupa Digital para leer textos pequeños' },
+            { tipo: 'promo', texto: '🤖 Aprendé IA paso a paso - Cursos gratuitos disponibles', link: 'https://iaparamayores.github.io/cursos-ia' }
+        ];
+
+        let indiceSlideActual = 0;
+
+        function mostrarSlide() {
+            const slideDiv = document.getElementById('slide-actual');
+            const slide = slides[indiceSlideActual];
+            
+            let html = '<span class="emoji">' + slide.texto.charAt(0) + '</span>';
+            
+            if (slide.link) {
+                html += '<a href="' + slide.link + '" target="_blank">' + slide.texto.substring(2) + '</a>';
+            } else {
+                html += slide.texto.substring(2);
+            }
+            
+            slideDiv.innerHTML = html;
+            
+            indiceSlideActual = (indiceSlideActual + 1) % slides.length;
+        }
+
+        // Iniciar rotación de slides (cada 5 segundos)
+        mostrarSlide();
+        setInterval(mostrarSlide, 5000);
+
+        // ==========================================
         // INICIALIZACIÓN
         // ==========================================
         dibujarTarjetas();
 
-        // Restaurar estado de bloqueo si estaba bloqueado
         if (parseInt(sessionStorage.getItem('intentos_pin') || "0") >= 2) {
             document.getElementById('inp-pin').disabled = true;
             document.getElementById('btn-entrar-pin').disabled = true;
             document.getElementById('btn-entrar-pin').style.backgroundColor = "#CCCCCC";
         }
 
-        // Registrar Service Worker para PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./service-worker.js')
@@ -1604,7 +1697,6 @@ Contacto: ${f.contacto || '-'}`;
             });
         }
 
-        // Enter en el PIN para validar
         document.getElementById('inp-pin').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') validarPin();
         });
